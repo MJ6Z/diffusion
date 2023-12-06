@@ -123,6 +123,8 @@ std::chrono::steady_clock::time_point lastrender = std::chrono::steady_clock::no
 
     D.svgpath = conf.getString ("svgpath", "");
     D.ellipse_a = conf.getDouble ("ellipse_a", 0.6);
+    D.ellipse_b = conf.getDouble ("ellipse_b", 0.6);
+
 
     // Control the size of the hexes, and therefore the number of hexes in the grid
     D.hextohex_d = conf.getFloat ("hextohex_d", 0.01f);
