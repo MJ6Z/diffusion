@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 # Give your project a name
-project(Schnakenberg)
+project(Hexes)
 
 # From CMAKE_SYSTEM work out which of __OSX__, __GLN__, __NIX__ are required
 if(CMAKE_SYSTEM MATCHES Linux.*)
@@ -64,7 +64,8 @@ find_package(Freetype REQUIRED)
 set(MORPH_INC_CORE ${ARMADILLO_INCLUDE_DIR} ${ARMADILLO_INCLUDE_DIRS} ${HDF5_INCLUDE_DIR})
 set(MORPH_INC_GL ${OPENGL_INCLUDE_DIR} ${GLFW3_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS})
 include_directories(${MORPH_INC_CORE} ${MORPH_INC_GL})
-# Assuming that you installed morphologica in-tree (i.e. 'next to' schnakenberg.cpp).
+
+# Assuming that you installed morphologica in-tree (i.e. 'next to' my cpp files.).
 set(MORPH_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/morphologica" CACHE PATH "The path to morphologica")
 include_directories(BEFORE ${MORPH_INCLUDE_PATH}/include) # Allows GL3/gl3.h to be found
 include_directories(BEFORE ${MORPH_INCLUDE_PATH})         # Allows morph/Header.h to be found
@@ -72,30 +73,15 @@ include_directories(BEFORE ${MORPH_INCLUDE_PATH})         # Allows morph/Header.
 #
 # All the library finding is now done. It's time to compile the program.
 #
-
-# The Schnakenberg RD system is compiled from a single c++ file
-add_executable(schnakenberg schnakenberg.cpp)
+add_executable(model hexvis.cpp)
 # Set compiler definitions. The size of our floats and the option to compile in the realtime visualization.
-target_compile_definitions(schnakenberg PUBLIC FLT=float COMPILE_PLOTTING)
-
-# Morphologica code requires a number of libraries, collected into 'CORE' and 'GL'.
+target_compile_definitions(model PUBLIC FLT=float)
 set(MORPH_LIBS_CORE ${ARMADILLO_LIBRARY} ${ARMADILLO_LIBRARIES} ${HDF5_C_LIBRARIES})
 set(MORPH_LIBS_GL OpenGL::GL Freetype::Freetype glfw)
-target_link_libraries(schnakenberg ${MORPH_LIBS_CORE} ${MORPH_LIBS_GL})
+target_link_libraries(model ${MORPH_LIBS_CORE} ${MORPH_LIBS_GL})
 
 if(OpenMP_FOUND)
-  target_link_libraries(schnakenberg OpenMP::OpenMP_CXX)
-endif()
-
-
-
-add_executable(diffusion diffusion.cpp)
-# Set compiler definitions. The size of our floats and the option to compile in the realtime visualization.
-target_compile_definitions(diffusion PUBLIC FLT=float COMPILE_PLOTTING)
-target_link_libraries(diffusion ${MORPH_LIBS_CORE} ${MORPH_LIBS_GL})
-
-if(OpenMP_FOUND)
-  target_link_libraries(diffusion OpenMP::OpenMP_CXX)
+  target_link_libraries(model OpenMP::OpenMP_CXX)
 endif()
 
 # For debugging of variables:
