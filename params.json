@@ -1,0 +1,26 @@
+{
+    "about_me" : "diffusion",
+
+    "sect_global" : "Global simulation parameters",
+    "desc_steps" : "The number of steps to simulate for",
+    "steps" :1325000,
+    "plotevery": 500,
+    "desc_hextohex_d" : "Hex to hex distance, determines num hexes",
+    "hextohex_d" : 0.1,
+    "hexspan" : 55,
+    "boundaryFalloffDist" : 0.2,
+    "dt" : 0.001,
+    "colourmap" : "plasma",
+
+    "sect_ellipse" : "Ellipse parameters",
+    "ellipse_a" : 60,
+
+    "sect_model_params" : "diffusion parameters",
+    "D_phi" : 1,
+
+
+    "k1"  : 0.01,
+    "k2"  : 1,
+    "k3"  : 1,
+    "k4"  : 1.7
+}
