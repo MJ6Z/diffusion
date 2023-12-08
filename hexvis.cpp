@@ -170,7 +170,7 @@ auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
 v1.bindmodel (hgv1);
 hgv1->setScalarData (&D.phi);
 // Z position scaling - how hilly/bumpy the visual will be.
-hgv1->zScale.setParams (0.4f, 0.0f);
+hgv1->zScale.setParams (0.2f, 0.0f);
 // The second is the colour scaling. Set this to autoscale.
 hgv1->colourScale.do_autoscale = true;
 hgv1->cm.setType (cmt);
@@ -185,6 +185,10 @@ auto hgv1p = v1.addVisualModel (hgv1);
     while (finished == false) {
         // Step the model
         D.step();
+
+        if((D.stepCount % 1000) == 0){
+        std::cout << "My data range is " << D.phi.range() << std::endl;
+        };
 
         if ((D.stepCount % plotevery) == 0) {
             // These two lines update the data for the two hex grids. That leads to

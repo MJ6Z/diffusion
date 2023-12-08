@@ -12,11 +12,11 @@
 
     "boundaryFalloffDist" : 0.2,
     "dt" : 0.001,
-    "colourmap" : "plasma",
+    "colourmap" : "viridis",
 
     "sect_ellipse" : "Ellipse parameters",
-    "ellipse_a" : 5,
-    "ellipse_b" : 5,
+    "ellipse_a" : 1,
+    "ellipse_b" : 1,
 
 
     "sect_model_params" : "diffusion parameters",

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <morph/RD_Base.h>
 #include <morph/HdfData.h>
+#include <morph/vvec.h>
 
 /*!
  * Diffusion system.
@@ -15,7 +16,7 @@ public:
 
 
     alignas(alignof(std::vector<Flt>))
-    std::vector<Flt> phi;
+    morph::vvec<Flt> phi;
 
     /*
      * The diffusion parameters.
@@ -49,8 +50,9 @@ public:
 
     void init()
     {
-        // Initialise Phi with noise
-        this->noiseify_vector_variable (this->phi, 0.5, 1);
+        this->phi.zero();
+        phi[0]=1;
+
     }
 
 
@@ -67,7 +69,6 @@ public:
             dPhidt[h] =  this->D_phi * lapPhi[h] * phi_[h];
         }
     }
-
 
 
 
