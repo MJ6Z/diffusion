@@ -133,7 +133,7 @@ std::chrono::steady_clock::time_point lastrender = std::chrono::steady_clock::no
 
     // Boundary fall-off distance, this is will ensure the system rolls off to zero at the boundary.
     //This is essentially neutrons being absorbed by the casing of the reactor.
-    D.boundaryFalloffDist = conf.getFloat ("boundaryFalloffDist", 0.1f);
+    D.boundaryFalloffDist = conf.getFloat("boundaryFalloffDist", 0.1f);
 
     // After setting the first few features, we can call the allocate function to set
     D.allocate();
@@ -170,7 +170,7 @@ auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
 v1.bindmodel (hgv1);
 hgv1->setScalarData (&D.phi);
 // Z position scaling - how hilly/bumpy the visual will be.
-hgv1->zScale.setParams (0.2f, 0.0f);
+hgv1->zScale.setParams (0.5f, 0.0f);
 // The second is the colour scaling. Set this to autoscale.
 hgv1->colourScale.do_autoscale = true;
 hgv1->cm.setType (cmt);
@@ -186,7 +186,7 @@ auto hgv1p = v1.addVisualModel (hgv1);
         // Step the model
         D.step();
 
-        if((D.stepCount % 1000) == 0){
+        if((D.stepCount % 100) == 0){
         std::cout << "My data range is " << D.phi.range() << std::endl;
         };
 

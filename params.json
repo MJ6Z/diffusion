@@ -3,15 +3,15 @@
 
     "sect_global" : "Global simulation parameters",
     "desc_steps" : "The number of steps to simulate for",
-    "steps" :1325000,
+    "steps" :1000000,
     "plotevery": 500,
 
     "desc_hextohex_d" : "Hex to hex distance, determines num hexes",
     "hextohex_d" : 0.1,
     "hexspan" : 55,
 
-    "boundaryFalloffDist" : 0.2,
-    "dt" : 0.001,
+    "boundaryFalloffDist" : 0.1,
+    "dt" : 0.0001,
     "colourmap" : "viridis",
 
     "sect_ellipse" : "Ellipse parameters",
@@ -20,7 +20,7 @@
 
 
     "sect_model_params" : "diffusion parameters",
-    "D_phi" : 1,
+    "D_phi" : 0.0001,
 
 
     "k1"  : 0.01,

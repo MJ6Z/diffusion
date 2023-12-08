@@ -52,7 +52,6 @@ public:
     {
         this->phi.zero();
         phi[0]=1;
-
     }
 
 
@@ -63,12 +62,18 @@ public:
         std::vector<Flt> lapPhi(this->nhex, 0.0);
         /*computing the laplacian, mapping compute_laplace(phi(x,y))=>lapPhi(x,y)*/
         this->compute_laplace (phi_, lapPhi);
-#pragma omp parallel for /*spawns a group of threads and divides loop iterations between them*/
-/*computes dPhi/dt for all hexes*/
+/*#pragma omp parallel for spawns a group of threads and divides loop iterations between them
+computes dPhi/dt for all hexes*/
         for (unsigned int h=0; h<this->nhex; ++h) {
-            dPhidt[h] =  this->D_phi * lapPhi[h] * phi_[h];
+            dPhidt[h] =  this->D_phi * lapPhi[h];
+
+
+            /*std::cout<<"dPhidt["<<this->hg->d_x[h]<<","<<this->hg->d_y[h]<<"] = "<<this->D_phi << " * " << lapPhi[h] << " * " <<phi_[h]<<" = "<<dPhidt[h]<<std::endl;*/
+
         }
     }
+
+
 
 
 
