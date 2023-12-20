@@ -75,7 +75,11 @@ include_directories(BEFORE ${MORPH_INCLUDE_PATH})         # Allows morph/Header.
 #
 add_executable(model hexvis.cpp)
 # Set compiler definitions. The size of our floats and the option to compile in the realtime visualization.
+
+#This allows me to change the size of my floats if nessesary
 target_compile_definitions(model PUBLIC FLT=float)
+
+
 set(MORPH_LIBS_CORE ${ARMADILLO_LIBRARY} ${ARMADILLO_LIBRARIES} ${HDF5_C_LIBRARIES})
 set(MORPH_LIBS_GL OpenGL::GL Freetype::Freetype glfw)
 target_link_libraries(model ${MORPH_LIBS_CORE} ${MORPH_LIBS_GL})

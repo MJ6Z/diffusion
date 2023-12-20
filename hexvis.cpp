@@ -1,6 +1,6 @@
 
 #ifndef FLT
-# error "Please define FLT when compiling (hint: See CMakeLists.txt)"
+# error "Please define FLT when compiling in CMakeLists.txt"
 #endif
 
 
@@ -122,6 +122,7 @@ std::chrono::steady_clock::time_point lastrender = std::chrono::steady_clock::no
     D_calc<FLT> D;
 
     D.svgpath = conf.getString ("svgpath", "");
+
     D.ellipse_a = conf.getDouble ("ellipse_a", 0.6);
     D.ellipse_b = conf.getDouble ("ellipse_b", 0.6);
 
@@ -131,54 +132,74 @@ std::chrono::steady_clock::time_point lastrender = std::chrono::steady_clock::no
     D.hexspan = conf.getFloat ("hexspan", 4.0f);
     //hexspan/hextohex = No of hexes.
 
-    // Boundary fall-off distance, this is will ensure the system rolls off to zero at the boundary.
-    //This is essentially neutrons being absorbed by the casing of the reactor.
-    D.boundaryFalloffDist = conf.getFloat("boundaryFalloffDist", 0.1f);
-
     // After setting the first few features, we can call the allocate function to set
     D.allocate();
 
     // After allocate(), we can set up parameters:
+    //timestep
     D.set_dt(dt);
+
+    //Runge Kutta parameters
     D.k1 = conf.getDouble ("k1", 1);
     D.k2 = conf.getDouble ("k2", 1);
     D.k3 = conf.getDouble ("k3", 1);
     D.k4 = conf.getDouble ("k4", 1);
+    //Diffusion constant
     D.D_phi = conf.getDouble ("D_phi", 0.1);
 
-    // Now parameters are set, call init(), which in this example simply initializes Phi with some noise.
+    //Values on the hexgrid, zeroPointValue being a set value at the middle hex
+    //and doNoise being a option to create a random set of values to map to phi.
+    D.zeroPointValue = conf.getDouble ("zeroPointValue", 0);
+    D.doNoise = conf.getBool ("doNoise",false);
+    D.noiseHeight = conf.getDouble("noiseHeight",1);
+
+    // Now parameters are set, call init().
     D.init();
 
 /*
 * This is the end of model setup.
 */
+    // Before starting the simulation, create the HexGridVisuals.
+
+    // Spatial offset, for positioning of HexGridVisuals
+    morph::vec<float> spatOff;
+    float xzero = 0.0f;
+
+    // A. Offset in x direction to the left.
+    xzero -= 0.5*D.hg->width();
+    spatOff = { xzero, 0.0, 0.0 };
+    morph::ColourMapType cmt = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap", "Jet"));
+
+    // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
+    auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    v1.bindmodel (hgv1);
+    hgv1->setScalarData (&D.phi);
+    // Z position scaling - how hilly/bumpy the visual will be.
+    hgv1->zScale.setParams (0.1f, 0.0f);
+    // The second is the colour scaling. Set this to autoscale.
+    hgv1->colourScale.do_autoscale = true;
+    hgv1->cm.setType (cmt);
+    //hgv1->hexVisMode = morph::HexVisMode::Triangles;
+    hgv1->addLabel ("Temperature compared to T0", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    // "finalize" is required before adding the HexGridVisual to the morph::Visual.
+    hgv1->finalize();
+    auto hgv1p = v1.addVisualModel (hgv1);
 
 
-
-// Spatial offset, for positioning of HexGridVisuals
-morph::vec<float> spatOff;
-float xzero = 0.0f;
-
-xzero -= 0.5 * D.hg->width();
-spatOff = { 0.0, 0.0, 0.0 };
-
-
-morph::ColourMapType cmt = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap", "Jet"));
-
-// Create a new HexGridVisual hgv1 then set its parameters:
-auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
-v1.bindmodel (hgv1);
-hgv1->setScalarData (&D.phi);
-// Z position scaling - how hilly/bumpy the visual will be.
-hgv1->zScale.setParams (0.5f, 0.0f);
-// The second is the colour scaling. Set this to autoscale.
-hgv1->colourScale.do_autoscale = true;
-hgv1->cm.setType (cmt);
-
-// "finalize" is required before adding the HexGridVisual to the morph::Visual.
-hgv1->finalize();
-auto hgv1p = v1.addVisualModel (hgv1);
-
+    // B. Offset in x direction to the right.
+    xzero += D.hg->width();
+    spatOff = { xzero, 0.0, 0.0 };
+    auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    v1.bindmodel (hgv2);
+    hgv2->setScalarData (&D.phi);
+    hgv2->zScale.setParams (0.1f, 0.0f);
+    hgv2->colourScale.do_autoscale = true;
+    hgv2->cm.setType (cmt);
+    hgv2->addLabel ("Temperature scaled from max to min", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    hgv2->finalize();
+    auto hgv2p = v1.addVisualModel (hgv2);
 
     // Start the loop
     bool finished = false;
@@ -186,15 +207,17 @@ auto hgv1p = v1.addVisualModel (hgv1);
         // Step the model
         D.step();
 
-        if((D.stepCount % 100) == 0){
+        if((D.stepCount % 1000) == 0){
         std::cout << "My data range is " << D.phi.range() << std::endl;
         };
 
         if ((D.stepCount % plotevery) == 0) {
-            // These two lines update the data for the two hex grids. That leads to
-            // the CPU recomputing the OpenGL vertices for the visualizations.
+
             hgv1p->updateData (&(D.phi));
-            hgv1p->clearAutoscaleColour();
+
+            hgv2p->updateData (&(D.phi));
+            hgv2p->clearAutoscaleColour();
+
         }
         // rendering the graphics. After each simulation step, check if enough time
         // has elapsed for it to be necessary to call v1.render().

@@ -5,16 +5,11 @@
 #include <morph/HdfData.h>
 #include <morph/vvec.h>
 
-/*!
- * Diffusion system.
- */
 
-/*Inherit methods and attributes from the Reaction diffusion class (RD_base) for laplacian computation*/
+/*Inherit methods and attributes from the RD_base*/
 template <typename Flt>
 class D_calc : public morph::RD_Base<Flt>{
 public:
-
-
     alignas(alignof(std::vector<Flt>))
     morph::vvec<Flt> phi;
 
@@ -22,6 +17,10 @@ public:
      * The diffusion parameters.
      */
     alignas(Flt) Flt D_phi = 0.1;
+    alignas(Flt) Flt zeroPointValue = 0.0;
+    alignas(bool) bool doNoise = false;
+    alignas(Flt) Flt noiseHeight = 1;
+
 
     /*Runge-Kutta params*/
     alignas(Flt) Flt k1 = 1.0;
@@ -29,14 +28,8 @@ public:
     alignas(Flt) Flt k3 = 1.0;
     alignas(Flt) Flt k4 = 1.0;
 
-    /*!
-     * Constructor
-     */
+     //Constructor
     D_calc() : morph::RD_Base<Flt>() {}
-    /*!
-     * Destructor
-     */
-    ~D_calc() {} // No operation. RD_Base destructor will free HexGrid.
 
     void allocate()
     {
@@ -47,34 +40,28 @@ public:
         // a member of this class (via its parent, RD_Base)
         this->resize_vector_variable (this->phi);
     }
-
     void init()
     {
         this->phi.zero();
-        phi[0]=1;
+        if(doNoise){
+        this->noiseify_vector_variable (this->phi, 0.0, noiseHeight);}
+        phi[0]=zeroPointValue;
+
     }
 
 
-/*computing dPhi/dt = phi * D * laplacian*/
+/*computing dPhi/dt = D * laplacian*/
     void compute_dPhidt (std::vector<Flt>& phi_, std::vector<Flt>& dPhidt)
     {
-        /*creating a vector for the laplacian over the hexgrid 'nhex'*/
+        /*creating a vector for the laplacian over the hexgrid*/
         std::vector<Flt> lapPhi(this->nhex, 0.0);
-        /*computing the laplacian, mapping compute_laplace(phi(x,y))=>lapPhi(x,y)*/
         this->compute_laplace (phi_, lapPhi);
-/*#pragma omp parallel for spawns a group of threads and divides loop iterations between them
-computes dPhi/dt for all hexes*/
+
+        #pragma omp parallel for /*for spawns a group of threads and divides loop iterations between them*/
         for (unsigned int h=0; h<this->nhex; ++h) {
             dPhidt[h] =  this->D_phi * lapPhi[h];
-
-
-            /*std::cout<<"dPhidt["<<this->hg->d_x[h]<<","<<this->hg->d_y[h]<<"] = "<<this->D_phi << " * " << lapPhi[h] << " * " <<phi_[h]<<" = "<<dPhidt[h]<<std::endl;*/
-
         }
     }
-
-
-
 
 
 
