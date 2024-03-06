@@ -10,7 +10,8 @@
 
 
 "desc_colour": "Colouring options e.g. inferno, plasma, viridis, jet, greyscale",
-    "colourmap" : "inferno",
+    "colourmap_phi" : "viridis",
+    "colourmap_temp": "inferno",
     "doColourAutoscale": false,
 
 
@@ -24,6 +25,7 @@
 
 "desc_model_params" : "diffusion parameters.",
     "D_phi" : 0.0005,
+    "D_T": 0.005,
     "dt" : 0.0001,
     "zeroPointValue": 1,
     "boundaryFalloffDist" : 0.0,

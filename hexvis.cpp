@@ -9,7 +9,7 @@
 */
 
 
-#include "calc.h"
+#include "newcalc.h"
 
 
 
@@ -183,7 +183,8 @@ int main(int argc, char **argv){
     // vector of the offset, I'm onl worrying about an ofset leftwards at the moment.
     spatOff = { xzero, 0.0, 0.0 };
     //Set the colourmaptype as a variable cmt to use later. Note the use of strToColourMapType, a very useful function.
-    morph::ColourMapType cmt = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap", "Jet"));
+    morph::ColourMapType cmt_phi = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_phi", "Jet"));
+    morph::ColourMapType cmt_T = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_temp", "Jet"));
 
     // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
     auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
@@ -200,7 +201,7 @@ int main(int argc, char **argv){
 
     // colour properties & labelling.
     hgv1->colourScale.do_autoscale = true;
-    hgv1->cm.setType(cmt);
+    hgv1->cm.setType(cmt_phi);
     hgv1->addLabel("My first hexgridvisual", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
             morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
     // "finalize" is required before adding the HexGridVisual to the morph::Visual.
@@ -213,10 +214,10 @@ int main(int argc, char **argv){
     spatOff = { xzero, 0.0, 0.0 };
     auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv2);
-    hgv2->setScalarData (&D.phi);
+    hgv2->setScalarData (&D.T);
     hgv2->zScale.setParams (ZScaleMin, ZScaleMax);
     hgv2->colourScale.do_autoscale = true;
-    hgv2->cm.setType (cmt);
+    hgv2->cm.setType (cmt_T);
     hgv2->addLabel ("Temperature scaled from max to min", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
             morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
     hgv2->finalize();
@@ -229,6 +230,8 @@ int main(int argc, char **argv){
 
         if((D.stepCount % 10000) == 0 || D.stepCount == 0){
             std::cout << "My data range is " << D.phi.range() << std::endl;
+            std::cout << "My temperature range is " << D.T.range() << std::endl;
+
 
         };
 
@@ -241,10 +244,11 @@ int main(int argc, char **argv){
 
         if ((D.stepCount % plotevery) == 0) {
 
-            hgv1p->updateData (&(D.phi));=
-
-            hgv2p->updateData (&(D.phi));
+            //updades data in the visuals only when the visual is about to be replotted to save resources.
+            hgv1p->updateData (&(D.phi));
+            hgv2p->updateData (&(D.T));
             hgv2p->clearAutoscaleColour();
+
         }
 
         // rendering the graphics. After each simulation step, check if enough time
@@ -260,4 +264,4 @@ int main(int argc, char **argv){
     std::cout << "Ctrl-c or press x in graphics window to exit.\n";
     v1.keepOpen();
     return 0;
-}
+};
