@@ -1,4 +1,3 @@
-
 #ifndef FLT
 # error "Please define FLT when compiling in CMakeLists.txt"
 #endif
@@ -9,7 +8,7 @@
 */
 
 
-#include "newcalc.h"
+#include "calc.h"
 
 
 
@@ -68,6 +67,8 @@ int main(int argc, char **argv){
         return 1;
 
     }
+    bool debug = conf.getBool("debug",false);
+    bool range_out = conf.getBool("range_out",false);
 
 
     //getting simulation-wide parameters from JSON
@@ -157,10 +158,11 @@ int main(int argc, char **argv){
     D.k3 = conf.getDouble ("k3", 1);
     D.k4 = conf.getDouble ("k4", 1);
     //Diffusion constant
-    D.D_phi = conf.getDouble ("D_phi", 0.1);
+    D.D_Fflux = conf.getDouble ("D_Fflux", 0.1);
+    D.D_THflux = conf.getDouble ("D_THflux", 0.1);
 
     //Values on the hexgrid, zeroPointValue being a set value at the middle hex
-    //and doNoise being a option to create a random set of values to map to phi.
+    //and doNoise being a option to create a random set of values to map to Fflux.
     D.zeroPointValue = conf.getDouble ("zeroPointValue", 0);
     D.doNoise = conf.getBool ("doNoise",false);
 
@@ -173,44 +175,54 @@ int main(int argc, char **argv){
     // Before starting the simulation, create the HexGridVisuals.
 
 
-    // this ofsetting isn't really going to be required til I have multiple visuals, but I though it best to get it working now.
-    // Spatial offset, for positioning of the HexGridVisual.
-    morph::vec<float> spatOff;
-    float xzero = 0.0f;
 
-    // A. Offset in x direction to the left (-=)
-    xzero -= 0.5*D.hg->width();
-    // vector of the offset, I'm onl worrying about an ofset leftwards at the moment.
-    spatOff = { xzero, 0.0, 0.0 };
-    //Set the colourmaptype as a variable cmt to use later. Note the use of strToColourMapType, a very useful function.
-    morph::ColourMapType cmt_phi = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_phi", "Jet"));
-    morph::ColourMapType cmt_T = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_temp", "Jet"));
-
-    // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
-    auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
-    v1.bindmodel (hgv1);
-    hgv1->setScalarData (&D.phi);
-
-
-    // Z position scaling - how hilly/bumpy the visual will be.
+    // scale params.
     float ZScaleMin;
     float ZScaleMax;
     ZScaleMin = conf.getFloat("ZScaleMin",0);
     ZScaleMax = conf.getFloat("ZScaleMax",0);
+
+    // Spatial offsets, for positioning of the HexGridVisuals.
+    morph::vec<float> spatOff;
+    float xzero = 0.0f;
+    float yzero = 0.0f;
+    xzero = D.hg->width();
+    yzero = D.hg->width();
+
+
+
+    //Set the colourmaptype as a variable cmt to use later. Note the use of strToColourMapType, a very useful function.
+    morph::ColourMapType cmt_Fflux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_Fflux", "Jet"));
+    morph::ColourMapType cmt_T = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_T", "Jet"));
+    morph::ColourMapType cmt_total_flux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_total_flux", "Jet"));
+    // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
+    // this one is for Fflux.
+    spatOff = { -0.5*xzero, 0.0, 0.0 };
+    auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    v1.bindmodel (hgv1);
+    hgv1->setScalarData (&D.Fflux);
     hgv1->zScale.setParams (ZScaleMin, ZScaleMax);
 
     // colour properties & labelling.
     hgv1->colourScale.do_autoscale = true;
-    hgv1->cm.setType(cmt_phi);
-    hgv1->addLabel("My first hexgridvisual", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+    hgv1->cm.setType(cmt_Fflux);
+
+    if(debug)
+    {
+        hgv1->addLabel("hgv1 binded to hgvp1 data=Fflux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    }else{
+        hgv1->addLabel("Fast neutron flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
             morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    }
+
     // "finalize" is required before adding the HexGridVisual to the morph::Visual.
     hgv1->finalize();
     auto hgv1p = v1.addVisualModel (hgv1);
 
 
-    // B. Offset in x direction to the right.
-    xzero += D.hg->width();
+    //temperature visual.
+
     spatOff = { xzero, 0.0, 0.0 };
     auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv2);
@@ -218,22 +230,76 @@ int main(int argc, char **argv){
     hgv2->zScale.setParams (ZScaleMin, ZScaleMax);
     hgv2->colourScale.do_autoscale = true;
     hgv2->cm.setType (cmt_T);
+    if(debug){
+        hgv2->addLabel ("hgv2 binded to hgvp2, data=D.T", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    }else{
     hgv2->addLabel ("Temperature scaled from max to min", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-            morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    }
     hgv2->finalize();
     auto hgv2p = v1.addVisualModel (hgv2);
+
+
+
+
+    //thermal flux visual.
+
+    spatOff = {-0.5*xzero, yzero, 0.0 };
+    auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    v1.bindmodel (hgv3);
+    hgv3->setScalarData (&D.THflux);
+    hgv3->zScale.setParams (ZScaleMin, ZScaleMax);
+    hgv3->colourScale.do_autoscale = true;
+    hgv3->cm.setType (cmt_Fflux);
+    if(debug){
+        hgv3->addLabel ("hgv3 binded to hgvp3, data=D.THflux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    }else{
+    hgv3->addLabel ("Thermal neuton flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    }
+    hgv3->finalize();
+    auto hgv3p = v1.addVisualModel(hgv3);
+
+
+    //total flux visual.
+
+    spatOff = {-0.5*xzero, -yzero, 0.0 };
+    auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    v1.bindmodel (hgv4);
+    hgv4->setScalarData (&D.THflux);
+    hgv4->zScale.setParams (ZScaleMin, ZScaleMax);
+    hgv4->colourScale.do_autoscale = true;
+    hgv4->cm.setType (cmt_total_flux);
+    if(debug){
+        hgv4->addLabel ("hgv4 binded to hgvp4, data=D.total_flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    }else{
+    hgv4->addLabel ("Thermal neuton flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    }
+    hgv4->finalize();
+    auto hgv4p = v1.addVisualModel(hgv4);
+
+
+
+
 
 
     // Start the loop
     bool finished = false;
     while (finished == false) {
 
-        if((D.stepCount % 10000) == 0 || D.stepCount == 0){
-            std::cout << "My data range is " << D.phi.range() << std::endl;
-            std::cout << "My temperature range is " << D.T.range() << std::endl;
+        if(range_out){
+            if((D.stepCount % 10000) == 0 || D.stepCount == 0){
+                std::cout << "Fflux.range = " << D.Fflux.range() << std::endl;
+                std::cout << "THflux.range = " << D.Fflux.range() << std::endl;
+                std::cout << "t.range = " << D.T.range() << std::endl;
 
 
-        };
+            }
+        }
 
         // Step the model
         D.step();
@@ -245,13 +311,15 @@ int main(int argc, char **argv){
         if ((D.stepCount % plotevery) == 0) {
 
             //updades data in the visuals only when the visual is about to be replotted to save resources.
-            hgv1p->updateData (&(D.phi));
+            hgv1p->updateData (&(D.Fflux));
             hgv2p->updateData (&(D.T));
+            hgv3p->updateData (&(D.THflux));
+            hgv4p->updateData (&(D.total_flux));
             hgv2p->clearAutoscaleColour();
 
         }
 
-        // rendering the graphics. After each simulation step, check if enough time
+        // rendering the graFfluxcs. After each simulation step, check if enough time
         // has elapsed for it to be necessary to call v1.render().
         std::chrono::steady_clock::duration sincerender = std::chrono::steady_clock::now() - lastrender;
         if (std::chrono::duration_cast<std::chrono::milliseconds>(sincerender).count() > 17) { // 17 is about 60 Hz
@@ -261,7 +329,7 @@ int main(int argc, char **argv){
         }
     }
 
-    std::cout << "Ctrl-c or press x in graphics window to exit.\n";
+    std::cout << "Ctrl-c or press x in graFfluxcs window to exit.\n";
     v1.keepOpen();
     return 0;
 };
