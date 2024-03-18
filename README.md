@@ -12,16 +12,17 @@ Dependancies should be flagged up when required when building the program. Once 
 Installation guide for Debian/Ubuntu Linux. This project is not yet supported for other operating systems. It has not been tested on any other linux distros.
 (this includes installing morphalogica in-tree)
 ```bash
+#cloning my code
 git clone https://github.com/MJ6Z/diffusion
 
 #cloning and building morphalogica in tree.
 cd diffusion/
 git clone https://github.com/ABRG-Models/morphologica
-cd Morphalogica/
+cd morphologica/
 cmake -B build/
 
-#compiling my code
-#cd back to diffusion.
+#back in diffusion
+#building my code
 cmake -B build/
 cd build/
 make
