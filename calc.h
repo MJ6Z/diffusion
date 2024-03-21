@@ -53,10 +53,10 @@ class D_calc : public morph::RD_Base<Flt>
         this->noiseify_vector_variable (this->Fflux, 0.0, noiseHeight);
         this->noiseify_vector_variable (this->THflux, 0.0, noiseHeight);}
 
-
+        this->init_controlrods();
     }
 
-
+    void init_controlrods();
 
 
     void compute_dFfluxdt (std::vector<Flt>& Fflux_, std::vector<Flt>& dFfluxdt)
@@ -282,10 +282,6 @@ class D_calc : public morph::RD_Base<Flt>
             }
         }
     }
-
-
-
-
 
 };
 

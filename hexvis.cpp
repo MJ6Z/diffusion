@@ -169,6 +169,16 @@ int main(int argc, char **argv){
     // Now parameters are set, call init().
     D.init();
 
+
+    //Flagging hexes
+
+
+
+
+
+
+
+
     /*
     * This is the end of model setup.
     */
@@ -318,8 +328,7 @@ int main(int argc, char **argv){
             hgv2p->clearAutoscaleColour();
 
         }
-
-        // rendering the graFfluxcs. After each simulation step, check if enough time
+        // rendering the gr. After each simulation step, check if enough time
         // has elapsed for it to be necessary to call v1.render().
         std::chrono::steady_clock::duration sincerender = std::chrono::steady_clock::now() - lastrender;
         if (std::chrono::duration_cast<std::chrono::milliseconds>(sincerender).count() > 17) { // 17 is about 60 Hz

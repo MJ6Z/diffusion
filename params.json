@@ -2,7 +2,7 @@
 
 
 "debug": true,
-"range_out": false,
+"range_out": true,
 
 "desc_steps" : "The number of steps to simulate.",
     "steps" :10000000,
