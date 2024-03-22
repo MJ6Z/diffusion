@@ -18,11 +18,6 @@ git clone https://github.com/MJ6Z/diffusion
 #cloning and building morphalogica in tree.
 cd diffusion/
 git clone https://github.com/ABRG-Models/morphologica
-cd morphologica/
-cmake -B build/
-
-#back in diffusion
-#building my code
 cmake -B build/
 cd build/
 make
