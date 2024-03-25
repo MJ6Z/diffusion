@@ -174,11 +174,6 @@ int main(int argc, char **argv){
 
 
 
-
-
-
-
-
     /*
     * This is the end of model setup.
     */
@@ -207,7 +202,7 @@ int main(int argc, char **argv){
     morph::ColourMapType cmt_total_flux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_total_flux", "Jet"));
     // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
     // this one is for Fflux.
-    spatOff = { -0.5*xzero, 0.0, 0.0 };
+    spatOff = { -0.5f*xzero, 0.0f, 0.0f };
     auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv1);
     hgv1->setScalarData (&D.Fflux);
@@ -233,7 +228,7 @@ int main(int argc, char **argv){
 
     //temperature visual.
 
-    spatOff = { xzero, 0.0, 0.0 };
+    spatOff = { xzero, 0.0f, 0.0f };
     auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv2);
     hgv2->setScalarData (&D.T);
@@ -255,7 +250,7 @@ int main(int argc, char **argv){
 
     //thermal flux visual.
 
-    spatOff = {-0.5*xzero, yzero, 0.0 };
+    spatOff = {-0.5f*xzero, yzero, 0.0f };
     auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv3);
     hgv3->setScalarData (&D.THflux);
@@ -275,7 +270,7 @@ int main(int argc, char **argv){
 
     //total flux visual.
 
-    spatOff = {-0.5*xzero, -yzero, 0.0 };
+    spatOff = {-0.5f*xzero, -yzero, 0.0f };
     auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv4);
     hgv4->setScalarData (&D.THflux);
@@ -283,7 +278,7 @@ int main(int argc, char **argv){
     hgv4->colourScale.do_autoscale = true;
     hgv4->cm.setType (cmt_total_flux);
     if(debug){
-        hgv4->addLabel ("hgv4 binded to hgvp4, data=D.total_flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+        hgv4->addLabel ("hgv4 binded to hgvp4, showing the total flux distribution, data=D.total_flux as clearAutoscaleColour=True", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
                 morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
     }else{
     hgv4->addLabel ("Thermal neuton flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
@@ -325,7 +320,10 @@ int main(int argc, char **argv){
             hgv2p->updateData (&(D.T));
             hgv3p->updateData (&(D.THflux));
             hgv4p->updateData (&(D.total_flux));
+
+
             hgv2p->clearAutoscaleColour();
+            hgv4p->clearAutoscaleColour();
 
         }
         // rendering the gr. After each simulation step, check if enough time
