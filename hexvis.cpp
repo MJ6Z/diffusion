@@ -70,6 +70,20 @@ int main(int argc, char **argv){
     bool debug = conf.getBool("debug",false);
     bool range_out = conf.getBool("range_out",false);
 
+    morph::vvec<int> coolant_r = conf.getvvec<int>("coolant_r_locations");
+    morph::vvec<int> coolant_g = conf.getvvec<int>("coolant_g_locations");
+    morph::vvec<int> coolant_b = conf.getvvec<int>("coolant_b_locations");
+
+    if(coolant_r.size() != coolant_g.size() || coolant_g.size() != coolant_b.size()){
+        std::cerr<<"Ensure coolant positions are complete in paramsfile" <<std::endl;
+        return 1;
+    }
+
+
+
+
+
+
 
     //getting simulation-wide parameters from JSON
     // usage here: conf.get("find a value", if not found use this value:)
@@ -166,6 +180,13 @@ int main(int argc, char **argv){
     D.zeroPointValue = conf.getDouble ("zeroPointValue", 0);
     D.doNoise = conf.getBool ("doNoise",false);
 
+
+    D.coolant_positions.resize(coolant_b.size());    //can use coolant_b.size as r,g,b have been validated to eb equal in size.
+    for(unsigned int i=0; i<coolant_b.size(); i++){ //repacking data from individual coolant indexes into vec int, 3.
+        D.coolant_positions[i]={coolant_r[i],coolant_g[i],coolant_b[i]};
+    }
+
+
     // Now parameters are set, call init().
     D.init();
 
@@ -200,6 +221,7 @@ int main(int argc, char **argv){
     morph::ColourMapType cmt_Fflux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_Fflux", "Jet"));
     morph::ColourMapType cmt_T = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_T", "Jet"));
     morph::ColourMapType cmt_total_flux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_total_flux", "Jet"));
+    morph::ColourMapType cmt_celltype = morph::ColourMap<FLT>::strToColourMapType ("Jet");
     // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
     // this one is for Fflux.
     spatOff = { -0.5f*xzero, 0.0f, 0.0f };
@@ -281,11 +303,25 @@ int main(int argc, char **argv){
         hgv4->addLabel ("hgv4 binded to hgvp4, showing the total flux distribution, data=D.total_flux as clearAutoscaleColour=True", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
                 morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
     }else{
-    hgv4->addLabel ("Thermal neuton flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+    hgv4->addLabel ("Total Flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
                     morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
     }
     hgv4->finalize();
     auto hgv4p = v1.addVisualModel(hgv4);
+
+
+
+    spatOff = {0.5f*xzero, -yzero, 0.0f };
+    auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    v1.bindmodel (hgv5);
+    hgv5->setScalarData (&D.show_celltype);
+    hgv5->zScale.setParams (ZScaleMin, ZScaleMax);
+    hgv5->colourScale.do_autoscale = true;
+    hgv5->cm.setType (cmt_celltype);
+    hgv5->addLabel ("CONTROL, COOLANT, FUEL", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+    hgv5->finalize();
+    auto hgv5p = v1.addVisualModel(hgv5);
 
 
 
@@ -296,10 +332,15 @@ int main(int argc, char **argv){
     bool finished = false;
     while (finished == false) {
 
+        if(D.stepCount == 1){
+            hgv5p->updateData (&(D.show_celltype));
+            hgv5p->clearAutoscaleColour();
+        }
+
         if(range_out){
             if((D.stepCount % 10000) == 0 || D.stepCount == 0){
                 std::cout << "Fflux.range = " << D.Fflux.range() << std::endl;
-                std::cout << "THflux.range = " << D.Fflux.range() << std::endl;
+                std::cout << "THflux.range = " << D.THflux.range() << std::endl;
                 std::cout << "t.range = " << D.T.range() << std::endl;
 
 

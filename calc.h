@@ -18,6 +18,9 @@ class D_calc : public morph::RD_Base<Flt>
     morph::vvec<Flt> Fflux;
     morph::vvec<Flt> total_flux;
     morph::vvec<Flt> T; //temperature
+    morph::vvec<Flt> show_celltype;
+    morph::vvec<morph::vec<int,3>> coolant_positions; //RGB coordinates of coolant rods.
+
 
     alignas(Flt) Flt D_Fflux = 0.1;
     alignas(Flt) Flt D_THflux = 0.1;
@@ -41,12 +44,14 @@ class D_calc : public morph::RD_Base<Flt>
         this->resize_vector_variable (this->THflux);
         this->resize_vector_variable (this->total_flux);
         this->resize_vector_variable (this->T);
+        this->resize_vector_variable (this->show_celltype);
     }
 
     void init()
     {
         this->Fflux.zero();
         this->THflux.zero();
+        this->show_celltype.zero();
         this->T.zero();
         if(doNoise)
         { //if noise is set to true, apply random values from 0 to noiseHeight
@@ -54,33 +59,44 @@ class D_calc : public morph::RD_Base<Flt>
             this->noiseify_vector_variable (this->THflux, 0.0, noiseHeight);
         }
 
+        //just like step_T, step_Fflux, these functions can be incorporated into init() later.
         init_coolant_rods();
-        //init_control_rods();
-
+        init_control_rods();
+        init_fuel_rods();
+        draw_celltype();
     }
 
-    void init_coolant_rods(){
-        //HEX_USER_FLAG_0 IS A ***COOLANT*** channel.
-        //How to set a flag at some cubic coordinate to have a flag with the findHexAt function.
-        std::list<morph::Hex>::iterator pos; //set pos.
 
-        pos = this->hg->findHexAt(morph::vec<int, 3>({0,0,0} ));
-        if(pos != this->hg->hexen.end())
-        { //if pos is the end hex, then it is probably out of range.
-            pos->setUserFlags(HEX_USER_FLAG_0); //user flag 0 is coolant cell.}
+        //HEX_USER_FLAG_0 IS A ***COOLANT*** channel.
+    void init_coolant_rods()
+    {
+        std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
+        for(auto coolant_pos: this->coolant_positions){
+            pos = this->hg->findHexAt(coolant_pos);
+            if(pos != this->hg->hexen.end())
+            { //if pos is the end hex, then it is probably out of range.
+                pos->setUserFlags(HEX_USER_FLAG_0); //Assign the coolant channel flag to that point.
+            }
         }
     }
-
+            //HEX_USER_FLAG_1 IS A ***CONTROL*** rod.
     void init_control_rods()
     {
-        //HEX_USER_FLAG_1 IS A ***CONTROL*** rod.
-        //using flags on hexes to describe their properties
-        //How to set a flag at some cubic coordinate to have a flag with the findHexAt function.
-        std::list<morph::Hex>::iterator pos; //set pos.
-        pos = this->hg->findHexAt(morph::vec<int, 3>({0,0,0}));
+        std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
+        pos = this->hg->findHexAt(morph::vec<int, 3>({-4,0,4})); //find the value of some point r,g,b, cubic coordinates.
         if(pos != this->hg->hexen.end())
-        { //if pos is the end hex, then it is probably out of range.
-            pos->setUserFlags(HEX_USER_FLAG_1); //user flag 0 is coolant cell.}
+        { //if pos is the end hex, then it is probably the case r,g,b is out of range.
+            pos->setUserFlags(HEX_USER_FLAG_1); //Assign the control rod flag to that point.
+        }
+    }
+            //HEX_USER_FLAG_2 IS A ***FUEL*** rod.
+    void init_fuel_rods()
+    {
+        std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
+        pos = this->hg->findHexAt(morph::vec<int, 3>({5,0,0})); //find the value of some point r,g,b, cubic coordinates.
+        if(pos != this->hg->hexen.end())
+        { //if pos is the end hex, then it is probably the case r,g,b is out of range.
+            pos->setUserFlags(HEX_USER_FLAG_2); //Assign the fuel rod flag to that point.
         }
     }
 
@@ -96,12 +112,18 @@ class D_calc : public morph::RD_Base<Flt>
             //calculating
             dFfluxdt[hi->vi] =0.005*lapFflux[hi->vi];
 
-            //if the hex, hi, is a fuel cell.
+            //if the hex, hi, is a control cell.
             if(hi->getUserFlag(1)==true and Fflux[hi->vi]>=0.01)
             {
-                Fflux[hi->vi] = Fflux[hi->vi] -0.01;
+                dFfluxdt[hi->vi] += -0.01;
             }
             hi++; //iterate hi.
+
+            //if the hex, hi, is a fuel rod.
+            if(hi->getUserFlag(2)==true)
+            {
+                dFfluxdt[hi->vi] += THflux[hi->vi]*0.005;
+            }
         }
     }
 
@@ -117,9 +139,10 @@ class D_calc : public morph::RD_Base<Flt>
             //calculating
             dTHfluxdt[hi->vi] =0.005*lapTHflux[hi->vi];
 
+            //moderate fast flux into thermal flux if the cell is a control rod.
             if(hi->getUserFlag(1)==true and Fflux[hi->vi]>=0.01)
             {
-            THflux[hi->vi] += 0.01;
+            dTHfluxdt[hi->vi] += 0.01;
             }
             hi++; //iterate hi.
         }
@@ -150,6 +173,38 @@ class D_calc : public morph::RD_Base<Flt>
         }
     }
 
+    void source_neutrons(){
+        std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
+        pos = this->hg->findHexAt(morph::vec<int, 3>({5,0,-5} ));
+        Fflux[pos->vi] += 0.0001;
+    }
+
+    void draw_celltype()
+    {
+        std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
+        while(hi != this->hg->hexen.end()) // until the end of hi, run:
+        {
+            //coolant
+            if(hi->getUserFlag(0)==true)
+            {
+            show_celltype[hi->vi] = -1;
+            }
+            //control
+            if(hi->getUserFlag(1)==true)
+            {
+            show_celltype[hi->vi] = 1;
+            }
+            //fuel
+            if(hi->getUserFlag(2)==true)
+            {
+            show_celltype[hi->vi] = 10;
+            }
+
+
+            hi++; //iterate hi.
+        }
+    }
+
 
     void totalflux(){
         //use a parallelized for loop to calculate the total flux on the hex.
@@ -159,6 +214,7 @@ class D_calc : public morph::RD_Base<Flt>
         }
     }
     void step(){
+        source_neutrons();
         stepFflux();
         stepTHflux();
         stepT();

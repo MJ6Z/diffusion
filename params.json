@@ -1,7 +1,7 @@
 {
 
 
-"debug": true,
+"debug": false,
 "range_out": true,
 
 "desc_steps" : "The number of steps to simulate.",
@@ -37,7 +37,12 @@
     "zeroPointValue": 1,
     "boundaryFalloffDist" : 0.0,
     "doNoise": true,
-    "noiseHeight": 1,
+    "noiseHeight": 10,
+"desc_channel_params":",",
+    "coolant_r_locations":[0,0,1],
+    "coolant_g_locations":[0,2,4],
+    "coolant_b_locations":[0,2,2],
+
 
 
 
