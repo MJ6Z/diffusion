@@ -55,7 +55,6 @@ class D_calc : public morph::RD_Base<Flt>
         this->THflux.zero();
         this->show_celltype.zero();
         this->T.zero();
-        THflux[0]=10;
         if(doNoise)
         { //if noise is set to true, apply random values from 0 to noiseHeight
             this->noiseify_vector_variable (this->Fflux, 0.0, noiseHeight);
@@ -144,12 +143,12 @@ class D_calc : public morph::RD_Base<Flt>
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
             //calculating
-            dTHfluxdt[hi->vi] =0.005*lapTHflux[hi->vi];
+            dTHfluxdt[hi->vi] = 0.005*lapTHflux[hi->vi];
 
             //moderate fast flux into thermal flux if the cell is a control rod.
             if(hi->getUserFlag(1)==true and Fflux[hi->vi]>=0.001)
             {
-            dTHfluxdt[hi->vi] += 0.001;
+            dTHfluxdt[hi->vi] += 0.01;
             }
             hi++; //iterate hi.
         }
@@ -166,7 +165,8 @@ class D_calc : public morph::RD_Base<Flt>
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
             //calculating dT/dt
-            dTdt[hi->vi] =0.0005*THflux[hi->vi]+0.005*lapT[hi->vi]; //compute dT/dt
+            dTdt[hi->vi] =0.0005*THflux[hi->vi]+0.0005*Fflux[hi->vi]+0.005*lapT[hi->vi];
+            //compute dT/dt
 
             //if the current hex is a coolant cell, negate a small amount of dT/dt
             //getUserFlag(0)=true if setUserFlags(HEX_USER_FLAG_0) has been run on
@@ -183,7 +183,7 @@ class D_calc : public morph::RD_Base<Flt>
     void source_neutrons(){
         std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
         pos = this->hg->findHexAt(morph::vec<int, 3>({0,0,0} ));
-        Fflux[pos->vi] += 0.00001;
+        Fflux[pos->vi] += 0.001;
     }
 
     void draw_celltype()
