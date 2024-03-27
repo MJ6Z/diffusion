@@ -1,6 +1,4 @@
 {
-
-
 "debug": false,
 "range_out": true,
 
@@ -36,18 +34,18 @@
     "dt" : 0.0001,
     "zeroPointValue": 1,
     "boundaryFalloffDist" : 0.0,
-    "doNoise": true,
+    "doNoise": false,
     "noiseHeight": 10,
 "desc_channel_params":",",
     "coolant_r_locations":[0],
     "coolant_g_locations":[0],
     "coolant_b_locations":[0],
-    "control_r_locations":[-1],
-    "control_g_locations":[0],
-    "control_b_locations":[1],
-    "fuel_r_locations":[1],
-    "fuel_g_locations":[0],
-    "fuel_b_locations":[-1],
+    "control_r_locations":[-1,2],
+    "control_g_locations":[0,0],
+    "control_b_locations":[1,-1],
+    "fuel_r_locations":[0,1],
+    "fuel_g_locations":[0,0],
+    "fuel_b_locations":[0,-1],
 
 
 "desc_k": "Runge-Kuta parameters.",

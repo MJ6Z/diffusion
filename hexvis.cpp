@@ -345,7 +345,7 @@ int main(int argc, char **argv){
     hgv5->zScale.setParams (ZScaleMin, ZScaleMax);
     hgv5->colourScale.do_autoscale = true;
     hgv5->cm.setType (cmt_celltype);
-    hgv5->addLabel ("CONTROL, COOLANT, FUEL", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+    hgv5->addLabel ("CONTROL(light blue), COOLANT(dark blue), FUEL (red)", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
                     morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
     hgv5->finalize();
     auto hgv5p = v1.addVisualModel(hgv5);
@@ -389,6 +389,8 @@ int main(int argc, char **argv){
             hgv3p->updateData (&(D.THflux));
             hgv4p->updateData (&(D.total_flux));
 
+            hgv1p->clearAutoscaleColour();
+            hgv3p->clearAutoscaleColour();
 
             hgv2p->clearAutoscaleColour();
             hgv4p->clearAutoscaleColour();
@@ -404,7 +406,7 @@ int main(int argc, char **argv){
         }
     }
 
-    std::cout << "Ctrl-c or press x in graFfluxcs window to exit.\n";
+    std::cout << "Ctrl-c or press x in graphics window to exit.\n";
     v1.keepOpen();
     return 0;
 };

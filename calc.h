@@ -55,6 +55,7 @@ class D_calc : public morph::RD_Base<Flt>
         this->THflux.zero();
         this->show_celltype.zero();
         this->T.zero();
+        THflux[0]=10;
         if(doNoise)
         { //if noise is set to true, apply random values from 0 to noiseHeight
             this->noiseify_vector_variable (this->Fflux, 0.0, noiseHeight);
@@ -72,8 +73,8 @@ class D_calc : public morph::RD_Base<Flt>
         //HEX_USER_FLAG_0 IS A ***COOLANT*** channel.
     void init_coolant_rods()
     {
-        std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
-        for(auto coolant_pos: this->coolant_positions){
+        std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto coolant_pos: this->coolant_positions){//create a control_pos vector automatically to iterate through control_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
             pos = this->hg->findHexAt(coolant_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
@@ -84,8 +85,8 @@ class D_calc : public morph::RD_Base<Flt>
             //HEX_USER_FLAG_1 IS A ***CONTROL*** rod.
     void init_control_rods()
     {
-        std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
-        for(auto control_pos: this->control_positions){
+        std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto control_pos: this->control_positions){//create a control_pos vector automatically to iterate through control_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
             pos = this->hg->findHexAt(control_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
@@ -96,8 +97,8 @@ class D_calc : public morph::RD_Base<Flt>
             //HEX_USER_FLAG_2 IS A ***FUEL*** rod.
     void init_fuel_rods()
     {
-        std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
-        for(auto fuel_pos: this->fuel_positions){
+        std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto fuel_pos: this->fuel_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
             pos = this->hg->findHexAt(fuel_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
@@ -125,10 +126,10 @@ class D_calc : public morph::RD_Base<Flt>
             }
             hi++; //iterate hi.
 
-            //if the hex, hi, is a fuel rod.
+            //if the hex at hi is a fuel rod.
             if(hi->getUserFlag(2)==true)
             {
-                dFfluxdt[hi->vi] += THflux[hi->vi]*0.005;
+                dFfluxdt[hi->vi] += THflux[hi->vi]*3;
             }
         }
     }
@@ -146,9 +147,9 @@ class D_calc : public morph::RD_Base<Flt>
             dTHfluxdt[hi->vi] =0.005*lapTHflux[hi->vi];
 
             //moderate fast flux into thermal flux if the cell is a control rod.
-            if(hi->getUserFlag(1)==true and Fflux[hi->vi]>=0.01)
+            if(hi->getUserFlag(1)==true and Fflux[hi->vi]>=0.001)
             {
-            dTHfluxdt[hi->vi] += 0.01;
+            dTHfluxdt[hi->vi] += 0.001;
             }
             hi++; //iterate hi.
         }
@@ -181,8 +182,8 @@ class D_calc : public morph::RD_Base<Flt>
 
     void source_neutrons(){
         std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
-        pos = this->hg->findHexAt(morph::vec<int, 3>({5,0,-5} ));
-        Fflux[pos->vi] += 0.0001;
+        pos = this->hg->findHexAt(morph::vec<int, 3>({0,0,0} ));
+        Fflux[pos->vi] += 0.00001;
     }
 
     void draw_celltype()
