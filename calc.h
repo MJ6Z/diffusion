@@ -20,6 +20,8 @@ class D_calc : public morph::RD_Base<Flt>
     morph::vvec<Flt> T; //temperature
     morph::vvec<Flt> show_celltype;
     morph::vvec<morph::vec<int,3>> coolant_positions; //RGB coordinates of coolant rods.
+    morph::vvec<morph::vec<int,3>> control_positions; //RGB coordinates of coolant rods.
+    morph::vvec<morph::vec<int,3>> fuel_positions; //RGB coordinates of coolant rods.
 
 
     alignas(Flt) Flt D_Fflux = 0.1;
@@ -83,20 +85,24 @@ class D_calc : public morph::RD_Base<Flt>
     void init_control_rods()
     {
         std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
-        pos = this->hg->findHexAt(morph::vec<int, 3>({-4,0,4})); //find the value of some point r,g,b, cubic coordinates.
-        if(pos != this->hg->hexen.end())
-        { //if pos is the end hex, then it is probably the case r,g,b is out of range.
-            pos->setUserFlags(HEX_USER_FLAG_1); //Assign the control rod flag to that point.
+        for(auto control_pos: this->control_positions){
+            pos = this->hg->findHexAt(control_pos);
+            if(pos != this->hg->hexen.end())
+            { //if pos is the end hex, then it is probably out of range.
+                pos->setUserFlags(HEX_USER_FLAG_1); //Assign the coolant channel flag to that point.
+            }
         }
     }
             //HEX_USER_FLAG_2 IS A ***FUEL*** rod.
     void init_fuel_rods()
     {
         std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
-        pos = this->hg->findHexAt(morph::vec<int, 3>({5,0,0})); //find the value of some point r,g,b, cubic coordinates.
-        if(pos != this->hg->hexen.end())
-        { //if pos is the end hex, then it is probably the case r,g,b is out of range.
-            pos->setUserFlags(HEX_USER_FLAG_2); //Assign the fuel rod flag to that point.
+        for(auto fuel_pos: this->fuel_positions){
+            pos = this->hg->findHexAt(fuel_pos);
+            if(pos != this->hg->hexen.end())
+            { //if pos is the end hex, then it is probably out of range.
+                pos->setUserFlags(HEX_USER_FLAG_2); //Assign the coolant channel flag to that point.
+            }
         }
     }
 

@@ -39,11 +39,15 @@
     "doNoise": true,
     "noiseHeight": 10,
 "desc_channel_params":",",
-    "coolant_r_locations":[0,0,1],
-    "coolant_g_locations":[0,2,4],
-    "coolant_b_locations":[0,2,2],
-
-
+    "coolant_r_locations":[0],
+    "coolant_g_locations":[0],
+    "coolant_b_locations":[0],
+    "control_r_locations":[-1],
+    "control_g_locations":[0],
+    "control_b_locations":[1],
+    "fuel_r_locations":[1],
+    "fuel_g_locations":[0],
+    "fuel_b_locations":[-1],
 
 
 "desc_k": "Runge-Kuta parameters.",

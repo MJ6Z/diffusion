@@ -79,7 +79,22 @@ int main(int argc, char **argv){
         return 1;
     }
 
+    morph::vvec<int> control_r = conf.getvvec<int>("control_r_locations");
+    morph::vvec<int> control_g = conf.getvvec<int>("control_g_locations");
+    morph::vvec<int> control_b = conf.getvvec<int>("control_b_locations");
 
+    if(control_r.size() != control_g.size() || control_g.size() != control_b.size()){
+        std::cerr<<"Ensure control positions are complete in paramsfile" <<std::endl;
+        return 1;
+    }
+    morph::vvec<int> fuel_r = conf.getvvec<int>("fuel_r_locations");
+    morph::vvec<int> fuel_g = conf.getvvec<int>("fuel_g_locations");
+    morph::vvec<int> fuel_b = conf.getvvec<int>("fuel_b_locations");
+
+    if(fuel_r.size() != fuel_g.size() || fuel_g.size() != fuel_b.size()){
+        std::cerr<<"Ensure fuel positions are complete in paramsfile" <<std::endl;
+        return 1;
+    }
 
 
 
@@ -184,6 +199,18 @@ int main(int argc, char **argv){
     D.coolant_positions.resize(coolant_b.size());    //can use coolant_b.size as r,g,b have been validated to eb equal in size.
     for(unsigned int i=0; i<coolant_b.size(); i++){ //repacking data from individual coolant indexes into vec int, 3.
         D.coolant_positions[i]={coolant_r[i],coolant_g[i],coolant_b[i]};
+    }
+
+
+    D.control_positions.resize(control_b.size());    //can use control_b.size as r,g,b have been validated to eb equal in size.
+    for(unsigned int i=0; i<control_b.size(); i++){ //repacking data from individual control indexes into vec int, 3.
+        D.control_positions[i]={control_r[i],control_g[i],control_b[i]};
+    }
+
+
+    D.fuel_positions.resize(fuel_b.size());    //can use fuel_b.size as r,g,b have been validated to eb equal in size.
+    for(unsigned int i=0; i<fuel_b.size(); i++){ //repacking data from individual fuel indexes into vec int, 3.
+        D.fuel_positions[i]={fuel_r[i],fuel_g[i],fuel_b[i]};
     }
 
 
