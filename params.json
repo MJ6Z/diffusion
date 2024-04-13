@@ -13,13 +13,13 @@
 
 
 "desc_colour": "Colouring options e.g. inferno, plasma, viridis, jet, greyscale",
-    "colourmap_Fflux" : "viridis",
+    "colourmap_Fflux" : "plasma",
     "colourmap_total_flux": "greyscale",
     "colourmap_T": "inferno",
     "doColourAutoscale": false,
 
 
-"desc_depth": "options to vary the z scale of the visual",
+"desc_depth": "options to vary the z scale of t=he visual",
     "ZScaleMin": 0.0,
     "ZScaleMax": 0.0,
 "desc_ellipse": "size of ellipse.",
@@ -28,7 +28,7 @@
 
 
 "desc_model_params" : "diffusion parameters.",
-    "D_Fflux" : 0.001,
+    "D_Fflux" : 0.003,
     "D_THflux" : 0.001,
     "D_T": 0.005,
     "dt" : 0.0001,
@@ -36,7 +36,7 @@
     "boundaryFalloffDist" : 0.0,
     "doNoise": false,
     "noiseHeight": 10,
-"desc_channel_params":"Locations of control, coolant, and fuel rods in R G B (cubic) coordinates on the hexgrid.",
+"desc_channel_params":"Locations of coolant, control, and fuel channels in R G B (cubic) coordinates on the hexgrid.",
     "coolant_r_locations":[],
     "coolant_g_locations":[],
     "coolant_b_locations":[],

@@ -19,6 +19,7 @@ class D_calc : public morph::RD_Base<Flt>
     morph::vvec<Flt> total_flux;
     morph::vvec<Flt> T; //temperature
     morph::vvec<Flt> show_celltype;
+
     morph::vvec<morph::vec<int,3>> coolant_positions; //RGB coordinates of coolant rods.
     morph::vvec<morph::vec<int,3>> control_positions; //RGB coordinates of coolant rods.
     morph::vvec<morph::vec<int,3>> fuel_positions; //RGB coordinates of coolant rods.
@@ -119,17 +120,17 @@ class D_calc : public morph::RD_Base<Flt>
             dFfluxdt[hi->vi] =0.005*lapFflux[hi->vi];
 
             //if the hex, hi, is a control cell.
-            if(hi->getUserFlag(1)==true and Fflux[hi->vi]>=0.01)
+            if(hi->getUserFlag(1)==true)
             {
-                dFfluxdt[hi->vi] += -0.01;
+                dFfluxdt[hi->vi] += -0.01*this->Fflux[hi->vi];
             }
-            hi++; //iterate hi.
 
             //if the hex at hi is a fuel rod.
             if(hi->getUserFlag(2)==true)
             {
                 dFfluxdt[hi->vi] += THflux[hi->vi]*3;
             }
+            hi++; //iterate hi.
         }
     }
 
@@ -146,9 +147,9 @@ class D_calc : public morph::RD_Base<Flt>
             dTHfluxdt[hi->vi] = 0.005*lapTHflux[hi->vi];
 
             //moderate fast flux into thermal flux if the cell is a control rod.
-            if(hi->getUserFlag(1)==true and Fflux[hi->vi]>=0.001)
+            if(hi->getUserFlag(1)==true)
             {
-            dTHfluxdt[hi->vi] += 0.01;
+            dTHfluxdt[hi->vi] += 0.01*this->Fflux[hi->vi];
             }
             hi++; //iterate hi.
         }
@@ -180,10 +181,15 @@ class D_calc : public morph::RD_Base<Flt>
         }
     }
 
+    //adding source fast flux into a given position.
     void source_neutrons(){
-        std::list<morph::Hex>::iterator pos; //pos is a hex iterator.
-        pos = this->hg->findHexAt(morph::vec<int, 3>({0,0,0} ));
-        Fflux[pos->vi] += 0.001;
+        //pos is a hex iterator object i'm using for positioning of a hexagon.
+        std::list<morph::Hex>::iterator pos;
+        //Set the posittion of the neutron sources with RGB cubic coordinates. This will then be value(s) in params.json, so multiple (or none at all) sources can be used.
+        pos = this->hg->findHexAt(morph::vec<int, 3>({0,5,-5} ));
+        //Add an amount of neutron flux equal to  = intial flux value * e^(-lambda * t)
+        //This uses the vector index vi of pos as the location of the hexagon as a list index
+        Fflux[pos->vi] += 1*exp((-0.01)*this->stepCount);
     }
 
     void draw_celltype()
