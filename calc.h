@@ -26,10 +26,21 @@ public:
 
     alignas(Flt) Flt D_Fflux = 0.1;
     alignas(Flt) Flt D_THflux = 0.1;
+    alignas(Flt) Flt D_T = 0.1;
+
+    alignas(Flt) Flt dTdt_THflux_coeff = 0.0001;
+    alignas(Flt) Flt dTdt_Fflux_coeff = 0.0001;
+
+    alignas(Flt) Flt moderation_strength = 0.1;
+    alignas(Flt) Flt absorbtion_strength = 0.1;
+    alignas(Flt) Flt source_strength = 0.1;
+
+
     alignas(bool) bool doNoise = false;
     alignas(bool) bool sourceNeutrons = false;
     alignas(Flt) Flt sourceStrength = 1;
     alignas(Flt) Flt noiseHeight = 1;
+
 
     alignas(Flt) Flt k1 = 1.0;
     alignas(Flt) Flt k2 = 1.0;
@@ -109,12 +120,12 @@ public:
         std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
         while(hi != this->hg->hexen.end()){ // until the end of hi, run:
             //calculating
-            dFfluxdt[hi->vi] =0.005*lapFflux[hi->vi];
+            dFfluxdt[hi->vi] =this->D_Fflux*lapFflux[hi->vi] - this->absorbtion_strength*this->Fflux[hi->vi];
 
             //if the hex, hi, is a control cell.
             if(hi->getUserFlag(1)==true)
             {
-                dFfluxdt[hi->vi] += -0.1*this->Fflux[hi->vi];
+                dFfluxdt[hi->vi] += -this->moderation_strength*this->Fflux[hi->vi];
             }
 
             //if the hex at hi is a fuel rod.
@@ -135,12 +146,12 @@ public:
         std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
         while(hi != this->hg->hexen.end()){ // until the end of hi, run:
             //calculating
-            dTHfluxdt[hi->vi] = 0.005*lapTHflux[hi->vi];
+            dTHfluxdt[hi->vi] = this->D_THflux*lapTHflux[hi->vi];
 
             //moderate fast flux into thermal flux if the cell is a control rod.
             if(hi->getUserFlag(1)==true)
             {
-                dTHfluxdt[hi->vi] += 0.01*this->Fflux[hi->vi];
+                dTHfluxdt[hi->vi] += this->moderation_strength*this->Fflux[hi->vi];
             }
             hi++; //iterate hi.
 
@@ -162,7 +173,7 @@ public:
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
             //calculating dT/dt
-            dTdt[hi->vi] =0.01*THflux[hi->vi]+0.005*Fflux[hi->vi]+0.005*lapT[hi->vi];
+            dTdt[hi->vi] =this->dTdt_THflux_coeff*THflux[hi->vi]+this->dTdt_Fflux_coeff*Fflux[hi->vi]+this->D_T*lapT[hi->vi];
             //compute dT/dt
 
             //if the current hex is a coolant cell, negate a small amount of dT/dt
@@ -182,10 +193,10 @@ public:
         //pos is a hex iterator object i'm using for positioning of a hexagon.
         std::list<morph::Hex>::iterator pos;
         //Set the posittion of the neutron sources with RGB cubic coordinates. This will then be value(s) in params.json, so multiple (or none at all) sources can be used.
-        pos = this->hg->findHexAt(morph::vec<int, 3>({0,5,-5} ));
+        pos = this->hg->findHexAt(morph::vec<int, 3>({0,0,0} ));
         //Add an amount of neutron flux equal to  = intial flux value * e^(-lambda * t)
         //This uses the vector index vi of pos as the location of the hexagon as a list index
-        Fflux[pos->vi] += 1*exp((-0.01)*this->stepCount);
+        Fflux[pos->vi] += this->source_strength*exp((-0.01)*this->stepCount);
     }
 
     void draw_celltype(){

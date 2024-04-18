@@ -21,7 +21,7 @@
     "doColourAutoscale": true,
 
 
-"desc_depth": "options to vary the z scale of t=he visual",
+"desc_depth": "options to vary the z scale of the visual, experemental",
     "ZScaleMin": 0.0,
     "ZScaleMax": 0.0,
 "desc_ellipse": "size of ellipse.",
@@ -30,14 +30,26 @@
 
 
 "desc_model_params" : "diffusion parameters.",
-    "D_Fflux" : 0.003,
+
+    "D_Fflux" : 0.03,
     "D_THflux" : 0.001,
     "D_T": 0.001,
     "dt" : 0.0001,
+
+    "dTdt_THflux_coeff":0.005,
+    "dTdt_Fflux_coeff":0.0,
+
+    "moderation_strength": 0.1,
+    "absorbtion_strength": 0.001,
+
     "sourceNeutrons": true,
     "sourceStrength":0.5,
     "doNoise": false,
     "noiseHeight": 1,
+
+
+
+
 "desc_channel_params":"Locations of coolant, control, and fuel channels in R G B (cubic) coordinates on the hexgrid.",
     "coolant_r_locations":[-1,1,-5,0,5,5,0,-5,-2,0,2,0],
     "coolant_g_locations":[2,-2,5,5,0,-5,-5,0,0,-2,0,2],

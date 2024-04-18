@@ -185,15 +185,37 @@ int main(int argc, char **argv){
     D.k2 = conf.getDouble ("k2", 1);
     D.k3 = conf.getDouble ("k3", 1);
     D.k4 = conf.getDouble ("k4", 1);
-    //Diffusion constant
+    //Diffusion coefficients
     D.D_Fflux = conf.getDouble ("D_Fflux", 0.1);
     D.D_THflux = conf.getDouble ("D_THflux", 0.1);
+    D.D_T = conf.getDouble ("D_T", 0.1);
 
     //Values on the hexgrid.
     //and doNoise being a option to create a random set of values to map to Fflux.
     D.doNoise = conf.getBool ("doNoise",false);
     D.sourceNeutrons = conf.getBool("sourceNeutrons",false);
+    D.source_strength = conf.getDouble ("source_strength", 1);
 
+
+    //calculation coefficients
+    D.dTdt_THflux_coeff = conf.getDouble ("dTdt_THflux_coeff", 0.1);
+    D.dTdt_Fflux_coeff = conf.getDouble ("dTdt_Fflux_coeff", 0.1);
+
+
+    D.moderation_strength = conf.getDouble ("moderation_strength", 0.1);
+    if(D.moderation_strength>1){
+        std::cerr<<"Cannot moderate more than 100 percent of neutrons - Exitting." << std::endl;
+        return 1;
+    };
+
+    D.absorbtion_strength = conf.getDouble ("absorbtion_strength", 0.1);
+    if(D.moderation_strength>1){
+        std::cerr<<"Cannot absorb more than 100 percent of neutrons - Exitting." << std::endl;
+        return 1;
+    };
+
+
+    // Passing in positions. See comments.
     {
         D.coolant_positions.resize(coolant_b.size());    //can use coolant_b.size as r,g,b have been validated to eb equal in size.
         for(unsigned int i=0; i<coolant_b.size(); i++){ //repacking data from individual coolant indexes into vec int, 3.
@@ -240,18 +262,15 @@ int main(int argc, char **argv){
     xzero = D.hg->width();
     yzero = D.hg->width();
 
-
-
-    //Set the colourmaptype as various cmt_ varaibles. Note the use of strToColourMapType, a very useful function.
+//Set the colourmaptype as various cmt_ varaibles. Note the use of strToColourMapType, a very useful function.
     morph::ColourMapType cmt_Fflux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_Fflux", "Jet"));
     morph::ColourMapType cmt_THflux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_THflux", "Jet"));
     morph::ColourMapType cmt_T = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_T", "Jet"));
     morph::ColourMapType cmt_total_flux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_total_flux", "Jet"));
     morph::ColourMapType cmt_celltype = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("celltype_colourmap", "Jet"));
 
-
-    // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
-    // this one is for Fflux.
+// Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
+// this one is for Fflux.
     spatOff = { -0.5f*xzero, 0.0f, 0.0f };
     auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv1);
@@ -275,9 +294,7 @@ int main(int argc, char **argv){
     hgv1->finalize();
     auto hgv1p = v1.addVisualModel (hgv1);
 
-
-    //temperature visual.
-
+//temperature visual.
     spatOff = { xzero, 0.0f, 0.0f };
     auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv2);
@@ -295,11 +312,7 @@ int main(int argc, char **argv){
     hgv2->finalize();
     auto hgv2p = v1.addVisualModel (hgv2);
 
-
-
-
-    //thermal flux visual.
-
+//thermal flux visual.
     spatOff = {-0.5f*xzero, yzero, 0.0f };
     auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv3);
@@ -317,9 +330,7 @@ int main(int argc, char **argv){
     hgv3->finalize();
     auto hgv3p = v1.addVisualModel(hgv3);
 
-
-    //total flux visual.
-
+//total flux visual.
     spatOff = {-0.5f*xzero, -yzero, 0.0f };
     auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv4);
@@ -337,8 +348,7 @@ int main(int argc, char **argv){
     hgv4->finalize();
     auto hgv4p = v1.addVisualModel(hgv4);
 
-
-
+//type indicator visual.
     spatOff = {0.5f*xzero, -yzero, 0.0f };
     auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
     v1.bindmodel (hgv5);
@@ -350,7 +360,6 @@ int main(int argc, char **argv){
                     morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
     hgv5->finalize();
     auto hgv5p = v1.addVisualModel(hgv5);
-
 
 
 
@@ -390,11 +399,11 @@ int main(int argc, char **argv){
             hgv3p->updateData (&(D.THflux));
             hgv4p->updateData (&(D.total_flux));
 
-            hgv1p->clearAutoscaleColour();
-            hgv3p->clearAutoscaleColour();
+            hgv2p->clearAutoscaleColour();
+            hgv4p->clearAutoscaleColour();
             if(doAutoScale){
-                hgv2p->clearAutoscaleColour();
-                hgv4p->clearAutoscaleColour();}
+                hgv1p->clearAutoscaleColour();
+                hgv3p->clearAutoscaleColour();}
 
         }
         // rendering the gr. After each simulation step, check if enough time
