@@ -9,9 +9,8 @@
 
 /*Inherit methods and attributes from the RD_base*/
 template <typename Flt>
-class D_calc : public morph::RD_Base<Flt>
-{
-    public:
+class D_calc : public morph::RD_Base<Flt>{
+public:
     alignas(alignof(std::vector<Flt>))
 
     morph::vvec<Flt> THflux;
@@ -29,6 +28,8 @@ class D_calc : public morph::RD_Base<Flt>
     alignas(Flt) Flt D_THflux = 0.1;
     alignas(Flt) Flt zeroPointValue = 0.0;
     alignas(bool) bool doNoise = false;
+    alignas(bool) bool sourceNeutrons = false;
+    alignas(Flt) Flt sourceStrength = 1;
     alignas(Flt) Flt noiseHeight = 1;
 
     alignas(Flt) Flt k1 = 1.0;
@@ -39,8 +40,7 @@ class D_calc : public morph::RD_Base<Flt>
     D_calc() : morph::RD_Base<Flt>() {}
 
 
-    void allocate()
-    {
+        void allocate(){
         morph::RD_Base<Flt>::allocate();
 
         this->resize_vector_variable (this->Fflux);
@@ -50,8 +50,7 @@ class D_calc : public morph::RD_Base<Flt>
         this->resize_vector_variable (this->show_celltype);
     }
 
-    void init()
-    {
+    void init(){
         this->Fflux.zero();
         this->THflux.zero();
         this->show_celltype.zero();
@@ -69,10 +68,8 @@ class D_calc : public morph::RD_Base<Flt>
         draw_celltype();
     }
 
-
-        //HEX_USER_FLAG_0 IS A ***COOLANT*** channel.
-    void init_coolant_rods()
-    {
+    //HEX_USER_FLAG_0 IS A ***COOLANT*** channel.
+    void init_coolant_rods(){
         std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
         for(auto coolant_pos: this->coolant_positions){//create a control_pos vector automatically to iterate through control_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
             pos = this->hg->findHexAt(coolant_pos);
@@ -82,9 +79,8 @@ class D_calc : public morph::RD_Base<Flt>
             }
         }
     }
-            //HEX_USER_FLAG_1 IS A ***CONTROL*** rod.
-    void init_control_rods()
-    {
+    //HEX_USER_FLAG_1 IS A ***CONTROL*** rod.
+    void init_control_rods(){
         std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
         for(auto control_pos: this->control_positions){//create a control_pos vector automatically to iterate through control_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
             pos = this->hg->findHexAt(control_pos);
@@ -94,9 +90,8 @@ class D_calc : public morph::RD_Base<Flt>
             }
         }
     }
-            //HEX_USER_FLAG_2 IS A ***FUEL*** rod.
-    void init_fuel_rods()
-    {
+    //HEX_USER_FLAG_2 IS A ***FUEL*** rod.
+    void init_fuel_rods(){
         std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
         for(auto fuel_pos: this->fuel_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
             pos = this->hg->findHexAt(fuel_pos);
@@ -108,57 +103,59 @@ class D_calc : public morph::RD_Base<Flt>
     }
 
 
-    void compute_dFfluxdt (std::vector<Flt>& Fflux_, std::vector<Flt>& dFfluxdt)
-    {
+    void compute_dFfluxdt (std::vector<Flt>& Fflux_, std::vector<Flt>& dFfluxdt){
         std::vector<Flt> lapFflux(this->nhex, 0.0);
         this->compute_laplace (Fflux_, lapFflux);
 
         std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
-        while(hi != this->hg->hexen.end()) // until the end of hi, run:
-        {
+        while(hi != this->hg->hexen.end()){ // until the end of hi, run:
             //calculating
             dFfluxdt[hi->vi] =0.005*lapFflux[hi->vi];
 
             //if the hex, hi, is a control cell.
             if(hi->getUserFlag(1)==true)
             {
-                dFfluxdt[hi->vi] += -0.01*this->Fflux[hi->vi];
+                dFfluxdt[hi->vi] += -0.1*this->Fflux[hi->vi];
             }
 
             //if the hex at hi is a fuel rod.
             if(hi->getUserFlag(2)==true)
             {
-                dFfluxdt[hi->vi] += THflux[hi->vi]*3;
+                dFfluxdt[hi->vi] += 1*(THflux[hi->vi]*3);
             }
+
             hi++; //iterate hi.
         }
     }
 
-    void compute_dTHfluxdt (std::vector<Flt>& THflux_, std::vector<Flt>& dTHfluxdt)
-    {
+    void compute_dTHfluxdt (std::vector<Flt>& THflux_, std::vector<Flt>& dTHfluxdt){
         std::vector<Flt> lapTHflux(this->nhex, 0.0);
 
         this->compute_laplace (THflux_, lapTHflux);
 
         std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
-        while(hi != this->hg->hexen.end()) // until the end of hi, run:
-        {
+        while(hi != this->hg->hexen.end()){ // until the end of hi, run:
             //calculating
             dTHfluxdt[hi->vi] = 0.005*lapTHflux[hi->vi];
 
             //moderate fast flux into thermal flux if the cell is a control rod.
             if(hi->getUserFlag(1)==true)
             {
-            dTHfluxdt[hi->vi] += 0.01*this->Fflux[hi->vi];
+                dTHfluxdt[hi->vi] += 0.01*this->Fflux[hi->vi];
             }
             hi++; //iterate hi.
+
+            //if the hex at hi is a fuel rod.
+            if(hi->getUserFlag(2)==true)
+            {
+                dTHfluxdt[hi->vi] -= 0.1*THflux[hi->vi];
+            }
+
         }
     }
 
-
-//compute rate of change of T with in input of a current state (T_) and a vector for the ROC (dTdt)
-    void compute_dTdt(std::vector<Flt>& T_, std::vector<Flt>& dTdt)
-    {
+    //compute rate of change of T with in input of a current state (T_) and a vector for the ROC (dTdt)
+    void compute_dTdt(std::vector<Flt>& T_, std::vector<Flt>& dTdt){
         //create a vector (lapT) for & compute the scalar laplacian over the hexgrid for T_.
         std::vector<Flt> lapT(this->nhex, 0.0);
         this->compute_laplace (T_, lapT);
@@ -166,23 +163,23 @@ class D_calc : public morph::RD_Base<Flt>
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
             //calculating dT/dt
-            dTdt[hi->vi] =0.0005*THflux[hi->vi]+0.0005*Fflux[hi->vi]+0.005*lapT[hi->vi];
+            dTdt[hi->vi] =0.01*THflux[hi->vi]+0.005*Fflux[hi->vi]+0.005*lapT[hi->vi];
             //compute dT/dt
 
             //if the current hex is a coolant cell, negate a small amount of dT/dt
             //getUserFlag(0)=true if setUserFlags(HEX_USER_FLAG_0) has been run on
             //that iterator index, otherwise false. See init_coolant_rods().
             //and T at hi is greater than the subtraction I'm going to make.
-            if(hi->getUserFlag(0)==true && T[hi->vi] >= 0.001)
+            if(hi->getUserFlag(0)==true)
             {
-                dTdt[hi->vi] -= 0.001;
+                dTdt[hi->vi] -= 0.5*T[hi->vi];
             }
             hi++; //iterate.
         }
     }
 
     //adding source fast flux into a given position.
-    void source_neutrons(){
+    void add_source_neutrons(){
         //pos is a hex iterator object i'm using for positioning of a hexagon.
         std::list<morph::Hex>::iterator pos;
         //Set the posittion of the neutron sources with RGB cubic coordinates. This will then be value(s) in params.json, so multiple (or none at all) sources can be used.
@@ -192,32 +189,30 @@ class D_calc : public morph::RD_Base<Flt>
         Fflux[pos->vi] += 1*exp((-0.01)*this->stepCount);
     }
 
-    void draw_celltype()
-    {
+    void draw_celltype(){
         std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
             //coolant
             if(hi->getUserFlag(0)==true)
             {
-            show_celltype[hi->vi] = -1;
+                show_celltype[hi->vi] = -1;
             }
             //control
             if(hi->getUserFlag(1)==true)
             {
-            show_celltype[hi->vi] = 1;
+                show_celltype[hi->vi] = 1;
             }
             //fuel
             if(hi->getUserFlag(2)==true)
             {
-            show_celltype[hi->vi] = 10;
+                show_celltype[hi->vi] = 10;
             }
 
 
             hi++; //iterate hi.
         }
     }
-
 
     void totalflux(){
         //use a parallelized for loop to calculate the total flux on the hex.
@@ -226,14 +221,29 @@ class D_calc : public morph::RD_Base<Flt>
             total_flux[h] = Fflux[h]+THflux[h];
         }
     }
+
+    void fail_conditions(){ //check if temperature has exceeded some maimumn value
+        //use a parallelized for loop to quickly go through the hexes.
+        #pragma omp parallel for
+        for (unsigned int h=0; h<this->nhex; ++h) { //loop from the 0th hexagon to the last hexagon.
+            if(T[h]>=1){ //using 1 as a test value, that will be replaced with a params file value.
+                //if T exceeds said value, print this message
+                std::cout<<"Failure! The reactor has overheated. \n";
+                std::exit(1);//then exit.
+            };
+        }
+    }
+
     void step(){
-        source_neutrons();
+        if(this->sourceNeutrons){add_source_neutrons();}
         stepFflux();
         stepTHflux();
         stepT();
         totalflux();
+        fail_conditions();
         this->stepCount++;
     }
+
     void stepFflux(){
         {
             // Ffluxtst: "Fflux at a test point". Ffluxtst is a temporary estimate for Fflux.
@@ -278,7 +288,7 @@ class D_calc : public morph::RD_Base<Flt>
             */
             this->compute_dFfluxdt (Ffluxtst, dFfluxdt);
             #pragma omp parallel for
-                for (unsigned int h=0; h<this->nhex; ++h) {
+            for (unsigned int h=0; h<this->nhex; ++h) {
                 K4[h] = dFfluxdt[h] * this->dt;
             }
 
@@ -291,6 +301,7 @@ class D_calc : public morph::RD_Base<Flt>
             }
         }
     }
+
     void stepT(){
         {
             // Ttemp: "T at a test point". Ttemp is a temporary estimate for T.
@@ -335,7 +346,7 @@ class D_calc : public morph::RD_Base<Flt>
             */
             this->compute_dTdt (Ttemp, dTdt);
             #pragma omp parallel for
-                for (unsigned int h=0; h<this->nhex; ++h) {
+            for (unsigned int h=0; h<this->nhex; ++h) {
                 K4[h] = dTdt[h] * this->dt;
             }
 
@@ -348,6 +359,7 @@ class D_calc : public morph::RD_Base<Flt>
             }
         }
     }
+
     void stepTHflux(){
         {
             // THfluxtst: "THflux at a test point". THfluxtst is a temporary estimate for THflux.
@@ -391,8 +403,8 @@ class D_calc : public morph::RD_Base<Flt>
             * Stage 4
             */
             this->compute_dTHfluxdt (THfluxtst, dTHfluxdt);
-            #pragma omp parallel for
-                for (unsigned int h=0; h<this->nhex; ++h) {
+            #pragma omp paralell for
+            for (unsigned int h=0; h<this->nhex; ++h) {
                 K4[h] = dTHfluxdt[h] * this->dt;
             }
 
@@ -405,6 +417,7 @@ class D_calc : public morph::RD_Base<Flt>
             }
         }
     }
+
 };
 
 
