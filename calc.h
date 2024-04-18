@@ -22,6 +22,7 @@ public:
     morph::vvec<morph::vec<int,3>> coolant_positions; //RGB coordinates of coolant rods.
     morph::vvec<morph::vec<int,3>> control_positions; //RGB coordinates of coolant rods.
     morph::vvec<morph::vec<int,3>> fuel_positions; //RGB coordinates of coolant rods.
+    morph::vvec<morph::vec<int,3>> source_positions; //RGB coordinates of source neutron positions.
 
 
     alignas(Flt) Flt D_Fflux = 0.1;
@@ -75,6 +76,7 @@ public:
         init_coolant_rods();
         init_control_rods();
         init_fuel_rods();
+        init_source_positions();
         draw_celltype();
     }
 
@@ -111,6 +113,18 @@ public:
             }
         }
     }
+    //HEX_USER_FLAG_3 IS A **SOURCE** position.
+    void init_source_positions(){
+        std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto source_pos: this->source_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
+            pos = this->hg->findHexAt(source_pos);
+            if(pos != this->hg->hexen.end())
+            { //if pos is the end hex, then it is probably out of range.
+                pos->setUserFlags(HEX_USER_FLAG_3); //Assign the coolant channel flag to that point.
+            }
+        }
+    }
+
 
 
     void compute_dFfluxdt (std::vector<Flt>& Fflux_, std::vector<Flt>& dFfluxdt){
@@ -191,12 +205,21 @@ public:
     //adding source fast flux into a given position.
     void add_source_neutrons(){
         //pos is a hex iterator object i'm using for positioning of a hexagon.
-        std::list<morph::Hex>::iterator pos;
         //Set the posittion of the neutron sources with RGB cubic coordinates. This will then be value(s) in params.json, so multiple (or none at all) sources can be used.
-        pos = this->hg->findHexAt(morph::vec<int, 3>({0,0,0} ));
+
         //Add an amount of neutron flux equal to  = intial flux value * e^(-lambda * t)
         //This uses the vector index vi of pos as the location of the hexagon as a list index
-        Fflux[pos->vi] += this->source_strength*exp((-0.01)*this->stepCount);
+
+        std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex, (hexen.begin)
+        while(hi != this->hg->hexen.end()) // until the end of hi, run:
+        {
+            if(hi->getUserFlag(3)==true)
+            {
+                Fflux[hi->vi] += this->source_strength*exp((-0.01)*this->stepCount);
+            }
+            hi++; //iterate.
+        }
+
     }
 
     void draw_celltype(){

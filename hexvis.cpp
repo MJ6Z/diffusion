@@ -96,6 +96,22 @@ int main(int argc, char **argv){
         return 1;
     }
 
+    morph::vvec<int> source_r = conf.getvvec<int>("source_r_locations");
+    morph::vvec<int> source_g = conf.getvvec<int>("source_g_locations");
+    morph::vvec<int> source_b = conf.getvvec<int>("source_b_locations");
+
+    if(source_r.size() != source_g.size() || source_g.size() != source_b.size()){
+        std::cerr<<"Ensure source positions are complete in paramsfile" <<std::endl;
+        return 1;
+    }
+
+
+
+
+
+
+
+
     bool doAutoScale = conf.getBool("doColourAutoscale",false);
 
 
@@ -155,7 +171,7 @@ int main(int argc, char **argv){
     /*
     *
     *
-    * Instantiating & setting up the model object class found in calc.h
+    * Instantiating & setting up the D object from the class D_calc found in calc.h
     *
     *
     */
@@ -233,29 +249,31 @@ int main(int argc, char **argv){
         for(unsigned int i=0; i<fuel_b.size(); i++){ //repacking data from individual fuel indexes into vec int, 3.
             D.fuel_positions[i]={fuel_r[i],fuel_g[i],fuel_b[i]};
         }
+
+        D.source_positions.resize(source_b.size());    //can use source_b.size as r,g,b have been validated to eb equal in size.
+        for(unsigned int i=0; i<source_b.size(); i++){ //repacking data from individual source indexes into vec int, 3.
+            D.source_positions[i]={source_r[i],source_g[i],source_b[i]};
+        }
     }
 
 
     // Now parameters are set, call init().
     D.init();
 
-    //Flagging hexes
-
-
     /*
     * This is the end of model setup.
     */
+
+
     // Before starting the simulation, create the HexGridVisuals.
 
-
-
-    // scale params.
+// scale params.
     float ZScaleMin;
     float ZScaleMax;
     ZScaleMin = conf.getFloat("ZScaleMin",0);
     ZScaleMax = conf.getFloat("ZScaleMax",0);
 
-    // Spatial offsets, for positioning of the HexGridVisuals.
+// Spatial offsets, for positioning of the HexGridVisuals.
     morph::vec<float> spatOff;
     float xzero = 0.0f;
     float yzero = 0.0f;

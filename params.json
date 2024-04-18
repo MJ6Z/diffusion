@@ -15,7 +15,7 @@
 "desc_colour": "Colouring options e.g. inferno, plasma, viridis, jet, greyscale",
     "colourmap_Fflux" : "viridis",
     "colourmap_THflux" : "viridis",
-    "celltype_colourmap": "jet",
+    "celltype_colourmap": "",
     "colourmap_total_flux": "magma",
     "colourmap_T": "inferno",
     "doColourAutoscale": true,
@@ -43,23 +43,27 @@
     "absorbtion_strength": 0.001,
 
     "sourceNeutrons": true,
-    "sourceStrength":0.5,
+    "source_strength": 1,
     "doNoise": false,
     "noiseHeight": 1,
 
 
 
 
-"desc_channel_params":"Locations of coolant, control, and fuel channels in R G B (cubic) coordinates on the hexgrid.",
+"desc_channel_params":"Locations of coolant, control, and source channels in R G B (cubic) coordinates on the hexgrid.",
     "coolant_r_locations":[-1,1,-5,0,5,5,0,-5,-2,0,2,0],
     "coolant_g_locations":[2,-2,5,5,0,-5,-5,0,0,-2,0,2],
     "coolant_b_locations":[-1,1,0,-5,-5,0,5,5,2,2,-2,-2],
     "control_r_locations":[0],
     "control_g_locations":[0],
     "control_b_locations":[0],
-    "fuel_r_locations":[-1,0,0,1],
-    "fuel_g_locations":[1,1,-1,-1],
-    "fuel_b_locations":[0,-1,1,0],
+    "source_r_locations":[-1,0,0,1],
+    "source_g_locations":[1,1,-1,-1],
+    "source_b_locations":[0,-1,1,0],
+    "source_r_locations":[0],
+    "source_g_locations":[5],
+    "source_b_locations":[0],
+
 
 
 "desc_k": "Runge-Kuta parameters.",
@@ -68,3 +72,7 @@
     "k3"  : 1,
     "k4"  : 1.7
 }
+
+
+
+
