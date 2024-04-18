@@ -189,9 +189,8 @@ int main(int argc, char **argv){
     D.D_Fflux = conf.getDouble ("D_Fflux", 0.1);
     D.D_THflux = conf.getDouble ("D_THflux", 0.1);
 
-    //Values on the hexgrid, zeroPointValue being a set value at the middle hex
+    //Values on the hexgrid.
     //and doNoise being a option to create a random set of values to map to Fflux.
-    D.zeroPointValue = conf.getDouble ("zeroPointValue", 0);
     D.doNoise = conf.getBool ("doNoise",false);
     D.sourceNeutrons = conf.getBool("sourceNeutrons",false);
 

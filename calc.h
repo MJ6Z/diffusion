@@ -26,7 +26,6 @@ public:
 
     alignas(Flt) Flt D_Fflux = 0.1;
     alignas(Flt) Flt D_THflux = 0.1;
-    alignas(Flt) Flt zeroPointValue = 0.0;
     alignas(bool) bool doNoise = false;
     alignas(bool) bool sourceNeutrons = false;
     alignas(Flt) Flt sourceStrength = 1;
