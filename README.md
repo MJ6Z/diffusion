@@ -3,7 +3,7 @@ A part of my A-level computer sciene NEA project.
 
 The idea of the program is to simulate the core of a nuclear reactor with a low level (but not no) realism using differential equations. This repo was orginally created as a source for code that simulates divergence-gradient diffision of one variable over a hexagonal grid.
 
-The program allows the user to change a variety of factors in [params.json](/params.json) aswell assign certain hexagons special properties. These being nuclear fuel rods, control rods, or coolant channels.
+The program allows the user to change a variety of factors in [params.json](/params.json) aswell assign certain hexagons special properties. These being nuclear fuel rods, control rods, or coolant channels as well as neutron source locations.
 
 The model is heavily dependant on the [morphologica](https://github.com/ABRG-Models/morphologica) library installed in-tree with the code.
 
