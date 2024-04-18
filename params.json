@@ -8,8 +8,8 @@
 
 
 "desc_hextohex_d" : "Hex to hex distance, determines num hexes.",
-    "hextohex_d" : 0.15,
-    "hexspan" : 55,
+    "hextohex_d" : 0.1,
+    "hexspan" : 8,
 
 
 "desc_colour": "Colouring options e.g. inferno, plasma, viridis, jet, greyscale",
@@ -31,16 +31,16 @@
 
 "desc_model_params" : "diffusion parameters.",
 
-    "D_Fflux" : 0.03,
+    "D_Fflux" : 0.01,
     "D_THflux" : 0.001,
     "D_T": 0.001,
     "dt" : 0.0001,
 
-    "dTdt_THflux_coeff":0.005,
-    "dTdt_Fflux_coeff":0.0,
+    "dTdt_THflux_coeff":0.001,
+    "dTdt_Fflux_coeff":0.0005,
 
-    "moderation_strength": 0.1,
-    "absorbtion_strength": 0.001,
+    "moderation_strength": 0.4,
+    "absorbtion_strength": 0.01,
 
     "sourceNeutrons": true,
     "source_strength": 1,
@@ -57,11 +57,11 @@
     "control_r_locations":[0],
     "control_g_locations":[0],
     "control_b_locations":[0],
-    "source_r_locations":[-1,0,0,1],
-    "source_g_locations":[1,1,-1,-1],
-    "source_b_locations":[0,-1,1,0],
+    "fuel_r_locations":[-1,0,0,1],
+    "fuel_g_locations":[1,1,-1,-1],
+    "fuel_b_locations":[0,-1,1,0],
     "source_r_locations":[0],
-    "source_g_locations":[5],
+    "source_g_locations":[0],
     "source_b_locations":[0],
 
 
