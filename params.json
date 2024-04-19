@@ -9,6 +9,7 @@
 
 "desc_hextohex_d" : "Hex to hex distance, determines num hexes.",
     "hextohex_d" : 0.1,
+"desc_hexspan" : "Hex",
     "hexspan" : 8,
 
 
@@ -41,6 +42,8 @@
 
     "moderation_strength": 0.4,
     "absorbtion_strength": 0.01,
+    "fuel_strength":1,
+    "neutrons_per_fission":3,
 
     "sourceNeutrons": true,
     "source_strength": 1,

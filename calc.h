@@ -35,7 +35,8 @@ public:
     alignas(Flt) Flt moderation_strength = 0.1;
     alignas(Flt) Flt absorbtion_strength = 0.1;
     alignas(Flt) Flt source_strength = 0.1;
-
+    alignas(Flt) Flt neutrons_per_fission = 3;
+    alignas(Flt) Flt fuel_strength = 1;
 
     alignas(bool) bool doNoise = false;
     alignas(bool) bool sourceNeutrons = false;
@@ -145,7 +146,7 @@ public:
             //if the hex at hi is a fuel rod.
             if(hi->getUserFlag(2)==true)
             {
-                dFfluxdt[hi->vi] += 1*(THflux[hi->vi]*3);
+                dFfluxdt[hi->vi] += this->fuel_strength*(THflux[hi->vi]*this->neutrons_per_fission);
             }
 
             hi++; //iterate hi.
@@ -205,7 +206,7 @@ public:
     //adding source fast flux into a given position.
     void add_source_neutrons(){
         //pos is a hex iterator object i'm using for positioning of a hexagon.
-        //Set the posittion of the neutron sources with RGB cubic coordinates. This will then be value(s) in params.json, so multiple (or none at all) sources can be used.
+        //Set the posittion of the neutron sources with RGB cubic coordinates. This will then be value(s) in params.json, so multiple sources can be used.
 
         //Add an amount of neutron flux equal to  = intial flux value * e^(-lambda * t)
         //This uses the vector index vi of pos as the location of the hexagon as a list index

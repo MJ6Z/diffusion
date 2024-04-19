@@ -216,6 +216,9 @@ int main(int argc, char **argv){
     //calculation coefficients
     D.dTdt_THflux_coeff = conf.getDouble ("dTdt_THflux_coeff", 0.1);
     D.dTdt_Fflux_coeff = conf.getDouble ("dTdt_Fflux_coeff", 0.1);
+    D.neutrons_per_fission = conf.getDouble ("neutrons_per_fission", 0.1);
+    D.fuel_strength = conf.getDouble ("fuel_strength", 0.1);
+
 
 
     D.moderation_strength = conf.getDouble ("moderation_strength", 0.1);
