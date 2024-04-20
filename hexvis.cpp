@@ -388,7 +388,7 @@ int main(int argc, char **argv){
 
     // Start the loop
     bool finished = false;
-    while (finished == false) {
+    while (finished == false && v1.readyToFinish == false) {
 
         if(D.stepCount == 1){
             hgv5p->updateData (&(D.show_celltype));
@@ -437,7 +437,7 @@ int main(int argc, char **argv){
         }
     }
 
-    std::cout << "Ctrl-c or press x in graphics window to exit.\n";
+    std::cout << "Ctrl-q in graphics window to exit.\n";
     v1.keepOpen();
     return 0;
 };
