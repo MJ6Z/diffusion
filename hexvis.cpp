@@ -105,13 +105,6 @@ int main(int argc, char **argv){
         return 1;
     }
 
-
-
-
-
-
-
-
     bool doAutoScale = conf.getBool("doColourAutoscale",false);
 
 

@@ -13,11 +13,13 @@ class D_calc : public morph::RD_Base<Flt>{
 public:
     alignas(alignof(std::vector<Flt>))
 
+
+    //state variables.
     morph::vvec<Flt> THflux;
     morph::vvec<Flt> Fflux;
     morph::vvec<Flt> total_flux;
     morph::vvec<Flt> T; //temperature
-    morph::vvec<Flt> show_celltype;
+    morph::vvec<Flt> show_celltype; //grid used to show rod types.
 
     morph::vvec<morph::vec<int,3>> coolant_positions; //RGB coordinates of coolant rods.
     morph::vvec<morph::vec<int,3>> control_positions; //RGB coordinates of coolant rods.
@@ -25,6 +27,7 @@ public:
     morph::vvec<morph::vec<int,3>> source_positions; //RGB coordinates of source neutron positions.
 
 
+    //coefficients & parameters.
     alignas(Flt) Flt D_Fflux = 0.1;
     alignas(Flt) Flt D_THflux = 0.1;
     alignas(Flt) Flt D_T = 0.1;
@@ -46,18 +49,19 @@ public:
     alignas(Flt) Flt sourceStrength = 1;
     alignas(Flt) Flt noiseHeight = 1;
 
-
+    //RK4 parameters.
     alignas(Flt) Flt k1 = 1.0;
     alignas(Flt) Flt k2 = 1.0;
     alignas(Flt) Flt k3 = 1.0;
     alignas(Flt) Flt k4 = 1.0;
 
+    //get data from class D_calc is inheritting from.
     D_calc() : morph::RD_Base<Flt>() {}
-
 
         void allocate(){
         morph::RD_Base<Flt>::allocate();
 
+        //resize the state varaiables to
         this->resize_vector_variable (this->Fflux);
         this->resize_vector_variable (this->THflux);
         this->resize_vector_variable (this->total_flux);
@@ -66,17 +70,19 @@ public:
     }
 
     void init(){
+        //zero state variables.
         this->Fflux.zero();
         this->THflux.zero();
-        this->show_celltype.zero();
         this->T.zero();
-        if(doNoise)
-        { //if noise is set to true, apply random values from 0 to noiseHeight
+        this->total_flux.zero();
+        this->show_celltype.zero();
+        if(doNoise){ //if noise is set to true, apply random values from 0 to noiseHeight
             this->noiseify_vector_variable (this->Fflux, 0.0, noiseHeight);
             this->noiseify_vector_variable (this->THflux, 0.0, noiseHeight);
         }
 
-        //just like step_T, step_Fflux, these functions can be incorporated into init() later.
+        //various init function calls, see there respective functions.
+
         init_coolant_rods();
         init_control_rods();
         init_fuel_rods();
