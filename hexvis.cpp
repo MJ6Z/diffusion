@@ -212,6 +212,9 @@ int main(int argc, char **argv){
     D.sourceNeutrons = conf.getBool("sourceNeutrons",false);
     D.source_strength = conf.getDouble ("source_strength", 1);
 
+    //the temperature at which the reactor will undergo a metltdown.
+    D.temperature_meltdown_value = conf.getFloat("temperature_meltdown_value",1);
+
 
     //calculation coefficients
     D.dTdt_THflux_coeff = conf.getDouble ("dTdt_THflux_coeff", 0.1);

@@ -10,7 +10,7 @@
 "desc_hextohex_d" : "Hex to hex distance, determines num hexes.",
     "hextohex_d" : 0.1,
 "desc_hexspan" : "the size of the hexagon the computer makes before 'cookie cuttering' out an ellipse.",
-    "hexspan" : 10,
+    "hexspan" : 10.0,
 
 
 "desc_colour": "Colouring options e.g. inferno, plasma, viridis, jet, greyscale",
@@ -26,29 +26,32 @@
     "ZScaleMin": 0.0,
     "ZScaleMax": 0.0,
 "desc_ellipse": "size of ellipse.",
-    "ellipse_a" : 1,
-    "ellipse_b" : 1,
+    "ellipse_a" : 1.0,
+    "ellipse_b" : 1.0,
 
 
 "desc_model_params" : "diffusion parameters.",
 
+
+    "temperature_meltdown_value":0.1,
+
     "D_Fflux" : 0.007,
-    "D_THflux" : 0.001,
-    "D_T": 0.001,
+    "D_THflux" : 0.003,
+    "D_T": 0.002,
     "dt" : 0.0001,
 
     "dTdt_THflux_coeff":0.01,
     "dTdt_Fflux_coeff":0.0005,
 
-    "moderation_strength": 0.5,
+    "moderation_strength": 0.6,
     "absorbtion_strength": 0.05,
-    "fuel_strength":1,
-    "neutrons_per_fission":5,
+    "fuel_strength":1.0,
+    "neutrons_per_fission":5.0,
 
     "sourceNeutrons": true,
-    "source_strength": 1,
+    "source_strength": 1.0,
     "doNoise": false,
-    "noiseHeight": 1,
+    "noiseHeight": 1.0,
 
 
 

@@ -32,6 +32,9 @@ public:
     alignas(Flt) Flt dTdt_THflux_coeff = 0.0001;
     alignas(Flt) Flt dTdt_Fflux_coeff = 0.0001;
 
+    alignas(Flt) Flt temperature_meltdown_value = 1.0;
+
+
     alignas(Flt) Flt moderation_strength = 0.1;
     alignas(Flt) Flt absorbtion_strength = 0.1;
     alignas(Flt) Flt source_strength = 0.1;
@@ -260,9 +263,9 @@ public:
         //use a parallelized for loop to quickly go through the hexes.
         #pragma omp parallel for
         for (unsigned int h=0; h<this->nhex; ++h) { //loop from the 0th hexagon to the last hexagon.
-            if(T[h]>=1){ //using 1 as a test value, that will be replaced with a params file value.
+            if(T[h]>=this->temperature_meltdown_value){ //if T at any hex exceeds a maximum, a meltdown occurs.
                 //if T exceeds said value, print this message
-                std::cout<<"Failure! The reactor has overheated. \n";
+                std::cout<<"Failure! The reactor has overheated & melt down. \n";
                 std::exit(1);//then exit.
             };
         }
