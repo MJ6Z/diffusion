@@ -223,9 +223,10 @@ int main(int argc, char **argv){
         return 1;
     };
 
+
     D.absorbtion_strength = conf.getDouble ("absorbtion_strength", 0.1);
     if(D.moderation_strength>1){
-        std::cerr<<"Cannot absorb more than 100 percent of neutrons - Exitting." << std::endl;
+        std::cerr<<"Cannot absorb more than 100 percent of neutrons, check your parameters - Exitting." << std::endl;
         return 1;
     };
 
@@ -384,6 +385,7 @@ int main(int argc, char **argv){
 
     // Start the loop
     bool finished = false;
+    //while the loop isn't finished and ready to finish is false. ctrl+q triggers readytofinish to be true.
     while (finished == false && v1.readyToFinish == false) {
 
         if(D.stepCount == 1){
@@ -423,7 +425,7 @@ int main(int argc, char **argv){
                 hgv3p->clearAutoscaleColour();}
 
         }
-        // rendering the gr. After each simulation step, check if enough time
+        // rendering the hg. After each simulation step, check if enough time
         // has elapsed for it to be necessary to call v1.render().
         std::chrono::steady_clock::duration sincerender = std::chrono::steady_clock::now() - lastrender;
         if (std::chrono::duration_cast<std::chrono::milliseconds>(sincerender).count() > 17) { // 17 is about 60 Hz
