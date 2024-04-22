@@ -1,3 +1,5 @@
+
+//using FLT defined from Cmakelists so I can change the size of my floating point numbers as desired.
 #ifndef FLT
 # error "Please define FLT when compiling in CMakeLists.txt"
 #endif
@@ -7,9 +9,7 @@
 * Include the calculation class.
 */
 
-
 #include "calc.h"
-
 
 
 /*!
@@ -40,7 +40,7 @@
 #include <morph/Config.h> //json read-writer
 
 /*
-* main() is in crontrol of the simulation. Parameters are controlled via JSON,
+* main() is in control of the simulation. Parameters are controlled via JSON,
 * argc and argv are used to pass in params.json at execution.*/
 
 
@@ -67,59 +67,72 @@ int main(int argc, char **argv){
         return 1;
 
     }
+    //get bool debug and option params for use later.
+    //usage here: conf.get("find a value", if not found use this value:)
     bool debug = conf.getBool("debug",false);
     bool range_out = conf.getBool("range_out",false);
+    bool doAutoScale = conf.getBool("doColourAutoscale",true);
 
+
+    //get coordinate r,g,b positions for fuel rods
     morph::vvec<int> coolant_r = conf.getvvec<int>("coolant_r_locations");
     morph::vvec<int> coolant_g = conf.getvvec<int>("coolant_g_locations");
     morph::vvec<int> coolant_b = conf.getvvec<int>("coolant_b_locations");
 
+    //check there are no incomplete coordinates.
     if(coolant_r.size() != coolant_g.size() || coolant_g.size() != coolant_b.size()){
         std::cerr<<"Ensure coolant positions are complete in paramsfile" <<std::endl;
         return 1;
     }
-
+    //get coordinate r,g,b positions for contorl rods
     morph::vvec<int> control_r = conf.getvvec<int>("control_r_locations");
     morph::vvec<int> control_g = conf.getvvec<int>("control_g_locations");
     morph::vvec<int> control_b = conf.getvvec<int>("control_b_locations");
 
+    //check there are no incomplete coordinates.
     if(control_r.size() != control_g.size() || control_g.size() != control_b.size()){
         std::cerr<<"Ensure control positions are complete in paramsfile" <<std::endl;
         return 1;
     }
+
+    //get coordinate r,g,b positions for fuel rods.
     morph::vvec<int> fuel_r = conf.getvvec<int>("fuel_r_locations");
     morph::vvec<int> fuel_g = conf.getvvec<int>("fuel_g_locations");
     morph::vvec<int> fuel_b = conf.getvvec<int>("fuel_b_locations");
 
+    //check there are no incomplete coordinates.
     if(fuel_r.size() != fuel_g.size() || fuel_g.size() != fuel_b.size()){
         std::cerr<<"Ensure fuel positions are complete in paramsfile" <<std::endl;
         return 1;
     }
-
+    //get coordinate r,g,b positions for sources.
     morph::vvec<int> source_r = conf.getvvec<int>("source_r_locations");
     morph::vvec<int> source_g = conf.getvvec<int>("source_g_locations");
     morph::vvec<int> source_b = conf.getvvec<int>("source_b_locations");
 
+    //check there are no incomplete coordinates.
     if(source_r.size() != source_g.size() || source_g.size() != source_b.size()){
         std::cerr<<"Ensure source positions are complete in paramsfile" <<std::endl;
         return 1;
     }
 
-    bool doAutoScale = conf.getBool("doColourAutoscale",false);
-
 
     //getting simulation-wide parameters from JSON
-    // usage here: conf.get("find a value", if not found use this value:)
+
+    //usage here: conf.get("find a value", if not found use this value:)
     const unsigned int steps = conf.getUInt ("steps", 1000UL);
     if (steps == 0) {
         std::cerr << "Not much point simulating 0 steps! Exiting." << std::endl;
         return 1;
 
     }
-
+    //get the dt timestep value.
     const FLT dt = static_cast<FLT>(conf.getDouble("dt", 0.00001));
     //returning No of steps.
     std::cout << "steps to simulate: " << steps << std::endl;
+
+
+
 
     /*
     *
@@ -393,7 +406,7 @@ int main(int argc, char **argv){
             hgv5p->clearAutoscaleColour();
         }
 
-        if(range_out){
+        if(range_out){ //if the rnge debug variable is true, spit out some values.
             if((D.stepCount % 10000) == 0 || D.stepCount == 0){
                 std::cout << "Fflux.range = " << D.Fflux.range() << std::endl;
                 std::cout << "THflux.range = " << D.THflux.range() << std::endl;
@@ -406,7 +419,7 @@ int main(int argc, char **argv){
         // Step the model
         D.step();
 
-        if (D.stepCount > steps) {
+        if (D.stepCount > steps) { //check if the program has finished, willl run last step.
             finished = true;
         }
 
@@ -418,13 +431,16 @@ int main(int argc, char **argv){
             hgv3p->updateData (&(D.THflux));
             hgv4p->updateData (&(D.total_flux));
 
+            //recolour.
             hgv2p->clearAutoscaleColour();
             hgv4p->clearAutoscaleColour();
-            if(doAutoScale){
+            if(doAutoScale){ //recolour if specified to.
                 hgv1p->clearAutoscaleColour();
                 hgv3p->clearAutoscaleColour();}
 
         }
+
+
         // rendering the hg. After each simulation step, check if enough time
         // has elapsed for it to be necessary to call v1.render().
         std::chrono::steady_clock::duration sincerender = std::chrono::steady_clock::now() - lastrender;

@@ -137,8 +137,11 @@ public:
 
 
 
+    //compute the rate of change of fast flux
     void compute_dFfluxdt (std::vector<Flt>& Fflux_, std::vector<Flt>& dFfluxdt){
+        //make a vector to then use to store laplacian
         std::vector<Flt> lapFflux(this->nhex, 0.0);
+        //compute laplacian & fill the vector.
         this->compute_laplace (Fflux_, lapFflux);
 
         std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
@@ -162,9 +165,12 @@ public:
         }
     }
 
+    //compute the rate of change of thermal flux
     void compute_dTHfluxdt (std::vector<Flt>& THflux_, std::vector<Flt>& dTHfluxdt){
-        std::vector<Flt> lapTHflux(this->nhex, 0.0);
 
+        //make a vector to then use to store laplacian
+        std::vector<Flt> lapTHflux(this->nhex, 0.0);
+        //compute laplacian & fill the vector.
         this->compute_laplace (THflux_, lapTHflux);
 
         std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
@@ -232,7 +238,7 @@ public:
 
     }
 
-    void draw_celltype(){
+    void draw_celltype(){ //creates the grid of values associated with the rod types.
         std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
@@ -259,6 +265,7 @@ public:
 
     void totalflux(){
         //use a parallelized for loop to calculate the total flux on the hex.
+        //is very simple & fast de to its design.
         #pragma omp parallel for
         for (unsigned int h=0; h<this->nhex; ++h) {
             total_flux[h] = Fflux[h]+THflux[h];
@@ -277,17 +284,21 @@ public:
         }
     }
 
-    void step(){
+    void step(){ //the procedure executed when the main progra steps the simulation. Calls all other relivent functions.
         if(this->sourceNeutrons){add_source_neutrons();}
         stepFflux();
         stepTHflux();
         stepT();
         totalflux();
         fail_conditions();
-        this->stepCount++;
+        this->stepCount++; //increment stepCount.
     }
 
-    void stepFflux(){
+    /*
+     * RK4 functions.
+     */
+
+    void stepFflux(){ //RK4 for fast flux.
         {
             // Ffluxtst: "Fflux at a test point". Ffluxtst is a temporary estimate for Fflux.
             std::vector<Flt> Ffluxtst(this->nhex, 0.0);
@@ -345,7 +356,7 @@ public:
         }
     }
 
-    void stepT(){
+    void stepT(){ //RK4 for Temperature.
         {
             // Ttemp: "T at a test point". Ttemp is a temporary estimate for T.
             std::vector<Flt> Ttemp(this->nhex, 0.0);
@@ -403,7 +414,7 @@ public:
         }
     }
 
-    void stepTHflux(){
+    void stepTHflux(){ //RK4 for thermal flux.
         {
             // THfluxtst: "THflux at a test point". THfluxtst is a temporary estimate for THflux.
             std::vector<Flt> THfluxtst(this->nhex, 0.0);
