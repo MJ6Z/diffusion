@@ -263,7 +263,7 @@ public:
         }
     }
 
-    void totalflux(){
+    void totalflux(){ //calculating fast flux + thermal flux.
         //use a parallelized for loop to calculate the total flux on the hex.
         //is very simple & fast de to its design.
         #pragma omp parallel for
@@ -296,6 +296,8 @@ public:
 
     /*
      * RK4 functions.
+     *
+     * They are identicle to each other. I will comment the first one 'in full'.
      */
 
     void stepFflux(){ //RK4 for fast flux.
@@ -310,9 +312,12 @@ public:
             /*
             * Stage 1
             */
+            //compute the differential with the current value.
             this->compute_dFfluxdt (this->Fflux, dFfluxdt);
-            #pragma omp parallel for
+
+            #pragma omp parallel for //paralellizing the for loop.
             for (unsigned int h=0; h<this->nhex; ++h) {
+                //calculating the new estimate Ffluxtst. Also calculate k1 for use later on.
                 K1[h] = dFfluxdt[h] * this->dt;
                 Ffluxtst[h] = this->Fflux[h] + K1[h] * 0.5 ;
             }

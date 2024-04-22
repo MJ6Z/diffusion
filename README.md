@@ -45,7 +45,6 @@ From your install directory (not your build directory) run:
 The parameters the model runs off are all based in [params.json](/params.json) they have brief descriptions.
 
 ## disclaimer
-This is an A-level CS project, and is not intented for real world use or development, I am not profficent enough with c++ to guarantee the safety of the program. But you're still welcome to have a look at what I've been getting up to!
+This is an A-level CS project, and is not intented for real world use or development. But you're still welcome to have a look at what I've been getting up to!
 
 ### README.md to be updated in the future.
-### Code docs will be available after this project is finished.
