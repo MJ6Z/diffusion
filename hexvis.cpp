@@ -303,7 +303,7 @@ int main(int argc, char **argv){
 // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
 // this one is for Fflux.
     spatOff = { -0.5f*xzero, 0.0f, 0.0f };
-    auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv1);
     hgv1->setScalarData (&D.Fflux);
     hgv1->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -327,7 +327,7 @@ int main(int argc, char **argv){
 
 //temperature visual.
     spatOff = { xzero, 0.0f, 0.0f };
-    auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv2);
     hgv2->setScalarData (&D.T);
     hgv2->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -345,7 +345,7 @@ int main(int argc, char **argv){
 
 //thermal flux visual.
     spatOff = {-0.5f*xzero, yzero, 0.0f };
-    auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv3);
     hgv3->setScalarData (&D.THflux);
     hgv3->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -363,7 +363,7 @@ int main(int argc, char **argv){
 
 //total flux visual.
     spatOff = {-0.5f*xzero, -yzero, 0.0f };
-    auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv4);
     hgv4->setScalarData (&D.THflux);
     hgv4->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -381,7 +381,7 @@ int main(int argc, char **argv){
 
 //type indicator visual.
     spatOff = {0.5f*xzero, -yzero, 0.0f };
-    auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv5);
     hgv5->setScalarData (&D.show_celltype);
     hgv5->zScale.setParams (ZScaleMin, ZScaleMax);
