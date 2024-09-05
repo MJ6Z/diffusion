@@ -1,5 +1,4 @@
-
-//using FLT defined from Cmakelists so I can change the size of my floating point numbers as desired.
+    //using FLT defined from Cmakelists so I can change the size of my floating point numbers as desired.
 #ifndef FLT
 # error "Please define FLT when compiling in CMakeLists.txt"
 #endif
@@ -162,7 +161,7 @@ int main(int argc, char **argv){
     v1.sceneLocked = conf.getBool ("sceneLocked", false);
 
     // You can set the scene x/y/z offsets.
-    v1.setZDefault (conf.getFloat ("z_default", 0.0f));
+    v1.setSceneTransZ (conf.getFloat ("z_default", 0.0f));
     v1.setSceneTransXY (conf.getFloat ("x_default", 0.0f),
                         conf.getFloat ("y_default", 0.0f));
 
@@ -303,7 +302,7 @@ int main(int argc, char **argv){
 // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
 // this one is for Fflux.
     spatOff = { -0.5f*xzero, 0.0f, 0.0f };
-    auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv1);
     hgv1->setScalarData (&D.Fflux);
     hgv1->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -314,11 +313,10 @@ int main(int argc, char **argv){
 
     if(debug)
     {
-        hgv1->addLabel("hgv1 binded to hgvp1 data=Fflux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+        hgv1->addLabel("hgv1 binded to hgvp1 data=Fflux", { -0.2f, D.ellipse_b*-1.4f, 0.01f }, morph::TextFeatures(0.1f, morph::colour::white));
     }else{
         hgv1->addLabel("Fast neutron flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+        morph::TextFeatures(0.1f, morph::colour::white));
     }
 
     // "finalize" is required before adding the HexGridVisual to the morph::Visual.
@@ -327,7 +325,7 @@ int main(int argc, char **argv){
 
 //temperature visual.
     spatOff = { xzero, 0.0f, 0.0f };
-    auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv2);
     hgv2->setScalarData (&D.T);
     hgv2->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -335,17 +333,17 @@ int main(int argc, char **argv){
     hgv2->cm.setType (cmt_T);
     if(debug){
         hgv2->addLabel ("hgv2 binded to hgvp2, data=D.T", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+                        morph::TextFeatures(0.1f, morph::colour::white));
     }else{
         hgv2->addLabel ("Temperature scaled from max to min", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+                        morph::TextFeatures(0.1f, morph::colour::white));
     }
     hgv2->finalize();
     auto hgv2p = v1.addVisualModel (hgv2);
 
 //thermal flux visual.
     spatOff = {-0.5f*xzero, yzero, 0.0f };
-    auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv3);
     hgv3->setScalarData (&D.THflux);
     hgv3->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -353,17 +351,17 @@ int main(int argc, char **argv){
     hgv3->cm.setType (cmt_THflux);
     if(debug){
         hgv3->addLabel ("hgv3 binded to hgvp3, data=D.THflux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+                        morph::TextFeatures(0.1f, morph::colour::white));
     }else{
         hgv3->addLabel ("Thermal neuton flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+                        morph::TextFeatures(0.1f, morph::colour::white));
     }
     hgv3->finalize();
     auto hgv3p = v1.addVisualModel(hgv3);
 
 //total flux visual.
     spatOff = {-0.5f*xzero, -yzero, 0.0f };
-    auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv4);
     hgv4->setScalarData (&D.THflux);
     hgv4->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -371,24 +369,24 @@ int main(int argc, char **argv){
     hgv4->cm.setType (cmt_total_flux);
     if(debug){
         hgv4->addLabel ("hgv4 binded to hgvp4, showing the total flux distribution, data=D.total_flux as clearAutoscaleColour=True", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+                        morph::TextFeatures(0.1f, morph::colour::white));
     }else{
         hgv4->addLabel ("Total Flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+                        morph::TextFeatures(0.1f, morph::colour::white));
     }
     hgv4->finalize();
     auto hgv4p = v1.addVisualModel(hgv4);
 
 //type indicator visual.
     spatOff = {0.5f*xzero, -yzero, 0.0f };
-    auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg, spatOff);
+    auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv5);
     hgv5->setScalarData (&D.show_celltype);
     hgv5->zScale.setParams (ZScaleMin, ZScaleMax);
     hgv5->colourScale.do_autoscale = true;
     hgv5->cm.setType (cmt_celltype);
     hgv5->addLabel ("CONTROL(light blue), COOLANT(dark blue), FUEL (red)", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                    morph::colour::white, morph::VisualFont::Vera, 0.1f, 48);
+                    morph::TextFeatures(0.1f, morph::colour::white));
     hgv5->finalize();
     auto hgv5p = v1.addVisualModel(hgv5);
 

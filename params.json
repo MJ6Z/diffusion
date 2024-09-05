@@ -8,7 +8,7 @@
 
 
 "desc_hextohex_d" : "Hex to hex distance, determines num hexes.",
-    "hextohex_d" : 0.1,
+    "hextohex_d" : 0.06,
 "desc_hexspan" : "the size of the hexagon the computer makes before 'cookie cuttering' out an ellipse.",
     "hexspan" : 10.0,
 
@@ -17,7 +17,7 @@
     "colourmap_Fflux" : "magma",
     "colourmap_THflux" : "inferno",
     "celltype_colourmap": "Jet",
-    "colourmap_total_flux": "viridis",
+    "colourmap_total_flux": "greyscale",
     "colourmap_T": "inferno",
     "doColourAutoscale": true,
 
@@ -33,12 +33,12 @@
 "desc_model_params" : "diffusion parameters.",
 
 
-    "temperature_meltdown_value":0.1,
+    "temperature_meltdown_value":1,
 
     "D_Fflux" : 0.007,
     "D_THflux" : 0.003,
-    "D_T": 0.002,
-    "dt" : 0.0001,
+    "D_T": 0.005,
+    "dt" : 0.00005,
 
     "dTdt_THflux_coeff":0.01,
     "dTdt_Fflux_coeff":0.0005,
@@ -46,7 +46,7 @@
     "moderation_strength": 0.6,
     "absorbtion_strength": 0.05,
     "fuel_strength":1.0,
-    "neutrons_per_fission":5.0,
+    "neutrons_per_fission":3.0,
 
     "sourceNeutrons": true,
     "source_strength": 1.0,
@@ -78,7 +78,6 @@
     "k3"  : 1,
     "k4"  : 1.7
 }
-
 
 
 
