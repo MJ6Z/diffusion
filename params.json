@@ -8,7 +8,7 @@
 
 
 "desc_hextohex_d" : "Hex to hex distance, determines num hexes.",
-    "hextohex_d" : 0.06,
+    "hextohex_d" : 0.08,
 "desc_hexspan" : "the size of the hexagon the computer makes before 'cookie cuttering' out an ellipse.",
     "hexspan" : 10.0,
 
@@ -40,18 +40,18 @@
     "D_T": 0.005,
     "dt" : 0.00005,
 
-    "dTdt_THflux_coeff":0.01,
-    "dTdt_Fflux_coeff":0.0005,
+    "dTdt_THflux_coeff":0.006,
+    "dTdt_Fflux_coeff":0.005,
 
     "moderation_strength": 0.6,
     "absorbtion_strength": 0.05,
     "fuel_strength":1.0,
     "neutrons_per_fission":3.0,
 
-    "sourceNeutrons": true,
-    "source_strength": 1.0,
-    "doNoise": false,
-    "noiseHeight": 1.0,
+    "sourceNeutrons": false,
+    "source_strength": 1,
+    "doNoise": true,
+    "noiseHeight": 0.01,
 
 
 
@@ -60,14 +60,14 @@
     "coolant_r_locations":[-1,1,-5,0,5,5,0,-5,-2,0,2,0],
     "coolant_g_locations":[2,-2,5,5,0,-5,-5,0,0,-2,0,2],
     "coolant_b_locations":[-1,1,0,-5,-5,0,5,5,2,2,-2,-2],
-    "control_r_locations":[0],
-    "control_g_locations":[0],
-    "control_b_locations":[0],
+    "control_r_locations":[3,-3],
+    "control_g_locations":[0,0],
+    "control_b_locations":[-3,3],
     "fuel_r_locations":[-1,0,0,1],
     "fuel_g_locations":[1,1,-1,-1],
     "fuel_b_locations":[0,-1,1,0],
-    "source_r_locations":[2],
-    "source_g_locations":[-3],
+    "source_r_locations":[0],
+    "source_g_locations":[0],
     "source_b_locations":[0],
 
 

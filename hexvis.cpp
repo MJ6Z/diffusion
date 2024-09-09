@@ -301,7 +301,7 @@ int main(int argc, char **argv){
 
 // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
 // this one is for Fflux.
-    spatOff = { -0.5f*xzero, 0.0f, 0.0f };
+    spatOff = { -0.9f*xzero, 0.0f, 0.0f };
     auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv1);
     hgv1->setScalarData (&D.Fflux);
@@ -342,7 +342,7 @@ int main(int argc, char **argv){
     auto hgv2p = v1.addVisualModel (hgv2);
 
 //thermal flux visual.
-    spatOff = {-0.5f*xzero, yzero, 0.0f };
+    spatOff = {-0.9f*xzero, 1.2f*yzero, 0.0f };
     auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv3);
     hgv3->setScalarData (&D.THflux);
@@ -360,7 +360,7 @@ int main(int argc, char **argv){
     auto hgv3p = v1.addVisualModel(hgv3);
 
 //total flux visual.
-    spatOff = {-0.5f*xzero, -yzero, 0.0f };
+    spatOff = {-0.9f*xzero, -1.2f*yzero, 0.0f };
     auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv4);
     hgv4->setScalarData (&D.THflux);
@@ -378,8 +378,8 @@ int main(int argc, char **argv){
     auto hgv4p = v1.addVisualModel(hgv4);
 
 //type indicator visual.
-    spatOff = {0.5f*xzero, -yzero, 0.0f };
-    auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
+    spatOff = {0.9f*xzero, -1.2f*yzero, 0.0f };
+    auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get() , spatOff);
     v1.bindmodel (hgv5);
     hgv5->setScalarData (&D.show_celltype);
     hgv5->zScale.setParams (ZScaleMin, ZScaleMax);
