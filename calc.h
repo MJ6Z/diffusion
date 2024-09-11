@@ -44,7 +44,8 @@ public:
     alignas(Flt) Flt neutrons_per_fission = 3;
     alignas(Flt) Flt fuel_strength = 1;
 
-    alignas(bool) bool doNoise = false;
+    alignas(bool) bool doFluxNoise = false;
+    alignas(bool) bool doTemperatureNoise = false;
     alignas(bool) bool sourceNeutrons = false;
     alignas(Flt) Flt sourceStrength = 1;
     alignas(Flt) Flt noiseHeight = 1;
@@ -76,10 +77,14 @@ public:
         this->T.zero();
         this->total_flux.zero();
         this->show_celltype.zero();
-        if(doNoise){ //if noise is set to true, apply random values from 0 to noiseHeight
+        if(doFluxNoise){ //if noise is set to true, apply random values from 0 to noiseHeight
             this->noiseify_vector_variable (this->Fflux, 0.0, noiseHeight);
             this->noiseify_vector_variable (this->THflux, 0.0, noiseHeight);
         }
+        if(doTemperatureNoise){ //if noise is set to true, apply random values from 0 to noiseHeight
+            this->noiseify_vector_variable (this->T, 0.0, noiseHeight);
+        }
+
 
         //various init function calls, see there respective functions.
 

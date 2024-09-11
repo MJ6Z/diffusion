@@ -14,7 +14,7 @@
 
 
 "desc_colour": "Colouring options e.g. inferno, plasma, viridis, jet, greyscale",
-    "colourmap_Fflux" : "magma",
+    "colourmap_Fflux" : "rainbow",
     "colourmap_THflux" : "inferno",
     "celltype_colourmap": "Jet",
     "colourmap_total_flux": "greyscale",
@@ -48,9 +48,10 @@
     "fuel_strength":1.0,
     "neutrons_per_fission":3.0,
 
-    "sourceNeutrons": false,
+    "sourceNeutrons": true,
     "source_strength": 1,
-    "doNoise": true,
+    "doFluxNoise": false,
+    "doTemperatureNoise": true,
     "noiseHeight": 0.01,
 
 

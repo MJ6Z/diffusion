@@ -213,7 +213,9 @@ int main(int argc, char **argv){
 
     //Values on the hexgrid.
     //and doNoise being a option to create a random set of values to map to Fflux.
-    D.doNoise = conf.getBool ("doNoise",false);
+    D.doTemperatureNoise = conf.getBool ("doTemperatureNoise",false);
+    D.doFluxNoise = conf.getBool ("doFluxNoise",false);
+
     D.sourceNeutrons = conf.getBool("sourceNeutrons",false);
     D.source_strength = conf.getDouble ("source_strength", 1);
 
