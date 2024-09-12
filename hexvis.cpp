@@ -215,6 +215,8 @@ int main(int argc, char **argv){
     //and doNoise being a option to create a random set of values to map to Fflux.
     D.doTemperatureNoise = conf.getBool ("doTemperatureNoise",false);
     D.doFluxNoise = conf.getBool ("doFluxNoise",false);
+    D.noiseMinHeight = conf.getFloat("noiseMinHeight", 0);
+
 
     D.sourceNeutrons = conf.getBool("sourceNeutrons",false);
     D.source_strength = conf.getDouble ("source_strength", 1);

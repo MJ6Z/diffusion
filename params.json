@@ -1,4 +1,5 @@
 {
+"doc": "https://docs.google.com/document/d/1NGe-KJ05MdMxL0QYyQIgrnFi_vPlYS1c6v0FGtRVxXw/edit?usp=sharing",
 "debug": false,
 "range_out": true,
 
@@ -33,26 +34,28 @@
 "desc_model_params" : "diffusion parameters.",
 
 
-    "temperature_meltdown_value":1,
+    "temperature_meltdown_value":2000,
 
     "D_Fflux" : 0.007,
     "D_THflux" : 0.003,
     "D_T": 0.005,
     "dt" : 0.00005,
 
-    "dTdt_THflux_coeff":0.006,
-    "dTdt_Fflux_coeff":0.005,
+    "dTdt_THflux_coeff":0.1,
+    "dTdt_Fflux_coeff":0.1,
 
     "moderation_strength": 0.6,
-    "absorbtion_strength": 0.05,
+    "absorbtion_strength": 0,
     "fuel_strength":1.0,
     "neutrons_per_fission":3.0,
 
     "sourceNeutrons": true,
     "source_strength": 1,
+
     "doFluxNoise": false,
     "doTemperatureNoise": true,
-    "noiseHeight": 0.01,
+    "noiseMaxHeight": 340,
+    "noiseMinHeight": 300,
 
 
 

@@ -48,7 +48,8 @@ public:
     alignas(bool) bool doTemperatureNoise = false;
     alignas(bool) bool sourceNeutrons = false;
     alignas(Flt) Flt sourceStrength = 1;
-    alignas(Flt) Flt noiseHeight = 1;
+    alignas(Flt) Flt noiseMaxHeight = 0;
+    alignas(Flt) Flt noiseMinHeight = 0;
 
     //RK4 parameters.
     alignas(Flt) Flt k1 = 1.0;
@@ -77,12 +78,12 @@ public:
         this->T.zero();
         this->total_flux.zero();
         this->show_celltype.zero();
-        if(doFluxNoise){ //if noise is set to true, apply random values from 0 to noiseHeight
-            this->noiseify_vector_variable (this->Fflux, 0.0, noiseHeight);
-            this->noiseify_vector_variable (this->THflux, 0.0, noiseHeight);
+        if(doFluxNoise){ //if noise is set to true, apply random values from 0 to noiseMaxHeight
+            this->noiseify_vector_variable (this->Fflux, 0.0, noiseMaxHeight);
+            this->noiseify_vector_variable (this->THflux, 0.0, noiseMaxHeight);
         }
-        if(doTemperatureNoise){ //if noise is set to true, apply random values from 0 to noiseHeight
-            this->noiseify_vector_variable (this->T, 0.0, noiseHeight);
+        if(doTemperatureNoise){ //if noise is set to true, apply random values from noiseMinHeight to noiseMaxHeight
+            this->noiseify_vector_variable (this->T, noiseMinHeight, noiseMaxHeight);
         }
 
 
