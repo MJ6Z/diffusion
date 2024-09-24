@@ -17,7 +17,6 @@ public:
     //state variables.
     morph::vvec<Flt> THflux;
     morph::vvec<Flt> Fflux;
-    morph::vvec<Flt> total_flux;
     morph::vvec<Flt> T; //temperature
     morph::vvec<Flt> show_celltype; //grid used to show rod types.
 
@@ -66,7 +65,6 @@ public:
         //resize the state varaiables to
         this->resize_vector_variable (this->Fflux);
         this->resize_vector_variable (this->THflux);
-        this->resize_vector_variable (this->total_flux);
         this->resize_vector_variable (this->T);
         this->resize_vector_variable (this->show_celltype);
     }
@@ -76,11 +74,10 @@ public:
         this->Fflux.zero();
         this->THflux.zero();
         this->T.zero();
-        this->total_flux.zero();
         this->show_celltype.zero();
         if(doFluxNoise){ //if noise is set to true, apply random values from 0 to noiseMaxHeight
-            this->noiseify_vector_variable (this->Fflux, 0.0, noiseMaxHeight);
-            this->noiseify_vector_variable (this->THflux, 0.0, noiseMaxHeight);
+            this->noiseify_vector_variable (this->Fflux, noiseMinHeight, noiseMaxHeight);
+            this->noiseify_vector_variable (this->THflux, noiseMinHeight, noiseMaxHeight);
         }
         if(doTemperatureNoise){ //if noise is set to true, apply random values from noiseMinHeight to noiseMaxHeight
             this->noiseify_vector_variable (this->T, noiseMinHeight, noiseMaxHeight);
@@ -269,15 +266,6 @@ public:
         }
     }
 
-    void totalflux(){ //calculating fast flux + thermal flux.
-        //use a parallelized for loop to calculate the total flux on the hex.
-        //is very simple & fast de to its design.
-        #pragma omp parallel for
-        for (unsigned int h=0; h<this->nhex; ++h) {
-            total_flux[h] = Fflux[h]+THflux[h];
-        }
-    }
-
     void fail_conditions(){ //check if temperature has exceeded some maimumn value
         //use a parallelized for loop to quickly go through the hexes.
         #pragma omp parallel for
@@ -295,7 +283,6 @@ public:
         stepFflux();
         stepTHflux();
         stepT();
-        totalflux();
         fail_conditions();
         this->stepCount++; //increment stepCount.
     }

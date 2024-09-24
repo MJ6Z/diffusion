@@ -216,6 +216,7 @@ int main(int argc, char **argv){
     D.doTemperatureNoise = conf.getBool ("doTemperatureNoise",false);
     D.doFluxNoise = conf.getBool ("doFluxNoise",false);
     D.noiseMinHeight = conf.getFloat("noiseMinHeight", 0);
+    D.noiseMaxHeight = conf.getFloat("noiseMaxHeight", 0);
 
 
     D.sourceNeutrons = conf.getBool("sourceNeutrons",false);
@@ -300,7 +301,6 @@ int main(int argc, char **argv){
     morph::ColourMapType cmt_Fflux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_Fflux", "Jet"));
     morph::ColourMapType cmt_THflux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_THflux", "Jet"));
     morph::ColourMapType cmt_T = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_T", "Jet"));
-    morph::ColourMapType cmt_total_flux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_total_flux", "Jet"));
     morph::ColourMapType cmt_celltype = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("celltype_colourmap", "Jet"));
 
 // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
@@ -346,7 +346,7 @@ int main(int argc, char **argv){
     auto hgv2p = v1.addVisualModel (hgv2);
 
 //thermal flux visual.
-    spatOff = {-0.9f*xzero, 1.2f*yzero, 0.0f };
+    spatOff = {-0.9f*xzero, 1.3f*yzero, 0.0f };
     auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv3);
     hgv3->setScalarData (&D.THflux);
@@ -363,26 +363,9 @@ int main(int argc, char **argv){
     hgv3->finalize();
     auto hgv3p = v1.addVisualModel(hgv3);
 
-//total flux visual.
-    spatOff = {-0.9f*xzero, -1.2f*yzero, 0.0f };
-    auto hgv4 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
-    v1.bindmodel (hgv4);
-    hgv4->setScalarData (&D.THflux);
-    hgv4->zScale.setParams (ZScaleMin, ZScaleMax);
-    hgv4->colourScale.do_autoscale = true;
-    hgv4->cm.setType (cmt_total_flux);
-    if(debug){
-        hgv4->addLabel ("hgv4 binded to hgvp4, showing the total flux distribution, data=D.total_flux as clearAutoscaleColour=True", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::TextFeatures(0.1f, morph::colour::white));
-    }else{
-        hgv4->addLabel ("Total Flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::TextFeatures(0.1f, morph::colour::white));
-    }
-    hgv4->finalize();
-    auto hgv4p = v1.addVisualModel(hgv4);
 
 //type indicator visual.
-    spatOff = {0.9f*xzero, -1.2f*yzero, 0.0f };
+    spatOff = {0.9f*xzero, 1.3f*yzero, 0.0f };
     auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get() , spatOff);
     v1.bindmodel (hgv5);
     hgv5->setScalarData (&D.show_celltype);
@@ -431,11 +414,9 @@ int main(int argc, char **argv){
             hgv1p->updateData (&(D.Fflux));
             hgv2p->updateData (&(D.T));
             hgv3p->updateData (&(D.THflux));
-            hgv4p->updateData (&(D.total_flux));
 
             //recolour.
             hgv2p->clearAutoscaleColour();
-            hgv4p->clearAutoscaleColour();
             if(doAutoScale){ //recolour if specified to.
                 hgv1p->clearAutoscaleColour();
                 hgv3p->clearAutoscaleColour();}
