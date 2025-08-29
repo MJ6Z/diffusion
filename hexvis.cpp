@@ -27,7 +27,7 @@
 */
 # include <mplot/Visual.h>
 # include <mplot/HexGridVisual.h>
-# include <mplot/HexGrid.h>
+# include <sm/hexgrid>
 # include <mplot/ColourMap.h>
 # include <mplot/VisualDataModel.h>
 # include <sm/scale>
@@ -58,10 +58,10 @@ int main(int argc, char **argv){
     }
     std::string paramsfile (argv[1]);
 
-    //Set up morph::Config JSON reader/writer for reading the parameters
+    //Set up sm::config JSON reader/writer for reading the parameters
     //Return error if this fails.
 
-    morph::Config conf(paramsfile);
+    sm::config conf(paramsfile);
     if (!conf.ready) {
         return 1;
 
@@ -74,9 +74,9 @@ int main(int argc, char **argv){
 
 
     //get coordinate r,g,b positions for fuel rods
-    morph::vvec<int> coolant_r = conf.getvvec<int>("coolant_r_locations");
-    morph::vvec<int> coolant_g = conf.getvvec<int>("coolant_g_locations");
-    morph::vvec<int> coolant_b = conf.getvvec<int>("coolant_b_locations");
+    sm::vvec<int> coolant_r = conf.getvvec<int>("coolant_r_locations");
+    sm::vvec<int> coolant_g = conf.getvvec<int>("coolant_g_locations");
+    sm::vvec<int> coolant_b = conf.getvvec<int>("coolant_b_locations");
 
     //check there are no incomplete coordinates.
     if(coolant_r.size() != coolant_g.size() || coolant_g.size() != coolant_b.size()){
@@ -84,9 +84,9 @@ int main(int argc, char **argv){
         return 1;
     }
     //get coordinate r,g,b positions for contorl rods
-    morph::vvec<int> control_r = conf.getvvec<int>("control_r_locations");
-    morph::vvec<int> control_g = conf.getvvec<int>("control_g_locations");
-    morph::vvec<int> control_b = conf.getvvec<int>("control_b_locations");
+    sm::vvec<int> control_r = conf.getvvec<int>("control_r_locations");
+    sm::vvec<int> control_g = conf.getvvec<int>("control_g_locations");
+    sm::vvec<int> control_b = conf.getvvec<int>("control_b_locations");
 
     //check there are no incomplete coordinates.
     if(control_r.size() != control_g.size() || control_g.size() != control_b.size()){
@@ -95,9 +95,9 @@ int main(int argc, char **argv){
     }
 
     //get coordinate r,g,b positions for fuel rods.
-    morph::vvec<int> fuel_r = conf.getvvec<int>("fuel_r_locations");
-    morph::vvec<int> fuel_g = conf.getvvec<int>("fuel_g_locations");
-    morph::vvec<int> fuel_b = conf.getvvec<int>("fuel_b_locations");
+    sm::vvec<int> fuel_r = conf.getvvec<int>("fuel_r_locations");
+    sm::vvec<int> fuel_g = conf.getvvec<int>("fuel_g_locations");
+    sm::vvec<int> fuel_b = conf.getvvec<int>("fuel_b_locations");
 
     //check there are no incomplete coordinates.
     if(fuel_r.size() != fuel_g.size() || fuel_g.size() != fuel_b.size()){
@@ -105,9 +105,9 @@ int main(int argc, char **argv){
         return 1;
     }
     //get coordinate r,g,b positions for sources.
-    morph::vvec<int> source_r = conf.getvvec<int>("source_r_locations");
-    morph::vvec<int> source_g = conf.getvvec<int>("source_g_locations");
-    morph::vvec<int> source_b = conf.getvvec<int>("source_b_locations");
+    sm::vvec<int> source_r = conf.getvvec<int>("source_r_locations");
+    sm::vvec<int> source_g = conf.getvvec<int>("source_g_locations");
+    sm::vvec<int> source_b = conf.getvvec<int>("source_b_locations");
 
     //check there are no incomplete coordinates.
     if(source_r.size() != source_g.size() || source_g.size() != source_b.size()){
@@ -147,8 +147,8 @@ int main(int argc, char **argv){
     unsigned int win_height_default = static_cast<unsigned int>(0.8824f * (float)win_width);
     const unsigned int win_height = conf.getUInt ("win_height", win_height_default);
 
-    // Set up the morph::Visual object:
-    morph::Visual v1 (win_width, win_height, "Hex Diffusion");
+    // Set up the mplot::Visual object:
+    mplot::Visual v1 (win_width, win_height, "Hex Diffusion");
 
     // Set a dark blue background, RGB:
     v1.bgcolour = {conf.getFloat("bgR", 0.2f), conf.getFloat("bgG", 0.2f), conf.getFloat("bgB", 0.2f), 1.0f};
@@ -158,7 +158,7 @@ int main(int argc, char **argv){
     v1.fov = 45;
 
     // unlock the scene (you cna pan around the visual)
-    v1.sceneLocked = conf.getBool ("sceneLocked", false);
+    v1.sceneLocked(conf.getBool ("sceneLocked", false));
 
     // You can set the scene x/y/z offsets.
     v1.setSceneTransZ (conf.getFloat ("z_default", 0.0f));
@@ -291,22 +291,22 @@ int main(int argc, char **argv){
     ZScaleMax = conf.getFloat("ZScaleMax",0);
 
 // Spatial offsets, for positioning of the HexGridVisuals.
-    morph::vec<float> spatOff;
+    sm::vec<float> spatOff;
     float xzero = 0.0f;
     float yzero = 0.0f;
     xzero = D.hg->width();
     yzero = D.hg->width();
 
 //Set the colourmaptype as various cmt_ varaibles. Note the use of strToColourMapType, a very useful function.
-    morph::ColourMapType cmt_Fflux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_Fflux", "Jet"));
-    morph::ColourMapType cmt_THflux = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_THflux", "Jet"));
-    morph::ColourMapType cmt_T = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_T", "Jet"));
-    morph::ColourMapType cmt_celltype = morph::ColourMap<FLT>::strToColourMapType (conf.getString ("celltype_colourmap", "Jet"));
+    mplot::ColourMapType cmt_Fflux = mplot::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_Fflux", "Jet"));
+    mplot::ColourMapType cmt_THflux = mplot::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_THflux", "Jet"));
+    mplot::ColourMapType cmt_T = mplot::ColourMap<FLT>::strToColourMapType (conf.getString ("colourmap_T", "Jet"));
+    mplot::ColourMapType cmt_celltype = mplot::ColourMap<FLT>::strToColourMapType (conf.getString ("celltype_colourmap", "Jet"));
 
 // Create a new HexGridVisual then set its parameters (zScale, colourScale, etc.
 // this one is for Fflux.
     spatOff = { -0.9f*xzero, 0.0f, 0.0f };
-    auto hgv1 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
+    auto hgv1 = std::make_unique<mplot::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv1);
     hgv1->setScalarData (&D.Fflux);
     hgv1->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -317,19 +317,19 @@ int main(int argc, char **argv){
 
     if(debug)
     {
-        hgv1->addLabel("hgv1 binded to hgvp1 data=Fflux", { -0.2f, D.ellipse_b*-1.4f, 0.01f }, morph::TextFeatures(0.1f, morph::colour::white));
+        hgv1->addLabel("hgv1 binded to hgvp1 data=Fflux", { -0.2f, D.ellipse_b*-1.4f, 0.01f }, mplot::TextFeatures(0.1f, mplot::colour::white));
     }else{
         hgv1->addLabel("Fast neutron flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-        morph::TextFeatures(0.1f, morph::colour::white));
+        mplot::TextFeatures(0.1f, mplot::colour::white));
     }
 
-    // "finalize" is required before adding the HexGridVisual to the morph::Visual.
+    // "finalize" is required before adding the HexGridVisual to the mplot::Visual.
     hgv1->finalize();
     auto hgv1p = v1.addVisualModel (hgv1);
 
 //temperature visual.
     spatOff = { xzero, 0.0f, 0.0f };
-    auto hgv2 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
+    auto hgv2 = std::make_unique<mplot::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv2);
     hgv2->setScalarData (&D.T);
     hgv2->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -337,17 +337,17 @@ int main(int argc, char **argv){
     hgv2->cm.setType (cmt_T);
     if(debug){
         hgv2->addLabel ("hgv2 binded to hgvp2, data=D.T", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::TextFeatures(0.1f, morph::colour::white));
+                        mplot::TextFeatures(0.1f, mplot::colour::white));
     }else{
         hgv2->addLabel ("Temperature scaled from max to min", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::TextFeatures(0.1f, morph::colour::white));
+                        mplot::TextFeatures(0.1f, mplot::colour::white));
     }
     hgv2->finalize();
     auto hgv2p = v1.addVisualModel (hgv2);
 
 //thermal flux visual.
     spatOff = {-0.9f*xzero, 1.3f*yzero, 0.0f };
-    auto hgv3 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get(), spatOff);
+    auto hgv3 = std::make_unique<mplot::HexGridVisual<FLT>> (D.hg.get(), spatOff);
     v1.bindmodel (hgv3);
     hgv3->setScalarData (&D.THflux);
     hgv3->zScale.setParams (ZScaleMin, ZScaleMax);
@@ -355,10 +355,10 @@ int main(int argc, char **argv){
     hgv3->cm.setType (cmt_THflux);
     if(debug){
         hgv3->addLabel ("hgv3 binded to hgvp3, data=D.THflux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::TextFeatures(0.1f, morph::colour::white));
+                        mplot::TextFeatures(0.1f, mplot::colour::white));
     }else{
         hgv3->addLabel ("Thermal neuton flux", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                        morph::TextFeatures(0.1f, morph::colour::white));
+                        mplot::TextFeatures(0.1f, mplot::colour::white));
     }
     hgv3->finalize();
     auto hgv3p = v1.addVisualModel(hgv3);
@@ -366,14 +366,14 @@ int main(int argc, char **argv){
 
 //type indicator visual.
     spatOff = {0.9f*xzero, 1.3f*yzero, 0.0f };
-    auto hgv5 = std::make_unique<morph::HexGridVisual<FLT>> (D.hg.get() , spatOff);
+    auto hgv5 = std::make_unique<mplot::HexGridVisual<FLT>> (D.hg.get() , spatOff);
     v1.bindmodel (hgv5);
     hgv5->setScalarData (&D.show_celltype);
     hgv5->zScale.setParams (ZScaleMin, ZScaleMax);
     hgv5->colourScale.do_autoscale = true;
     hgv5->cm.setType (cmt_celltype);
     hgv5->addLabel ("CONTROL(light blue), COOLANT(dark blue), FUEL (red)", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
-                    morph::TextFeatures(0.1f, morph::colour::white));
+                    mplot::TextFeatures(0.1f, mplot::colour::white));
     hgv5->finalize();
     auto hgv5p = v1.addVisualModel(hgv5);
 
@@ -384,7 +384,7 @@ int main(int argc, char **argv){
     // Start the loop
     bool finished = false;
     //while the loop isn't finished and ready to finish is false. ctrl+q triggers readytofinish to be true.
-    while (finished == false && v1.readyToFinish == false) {
+    while (finished == false && v1.readyToFinish() == false) {
 
         if(D.stepCount == 1){
             hgv5p->updateData (&(D.show_celltype));

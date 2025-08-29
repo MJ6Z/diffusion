@@ -16,8 +16,8 @@ else()
   message(ERROR "Operating system not supported: " ${CMAKE_SYSTEM})
 endif()
 
-# morphologica uses c++-17 language features
-set(CMAKE_CXX_STANDARD 17)
+# morphologica uses c++20  language features
+set(CMAKE_CXX_STANDARD 20)
 # Add the host definition to CXXFLAGS along with other switches, depending on OS/Compiler
 if (APPLE)
   set(CMAKE_CXX_FLAGS "${OS_FLAG} -Wall -Wfatal-errors -g -O3")
@@ -46,7 +46,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGL3_PROTOTYPES -DGL_GLEXT_PROTOTYPES")
 
 
 # Tell the program where the morph fonts are, to compile them into the binary
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMORPH_FONTS_DIR=\"\\\"${PROJECT_SOURCE_DIR}/mathplot/fonts\\\"\"")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMPLOT_FONTS_DIR=\"\\\"${PROJECT_SOURCE_DIR}/mathplot/fonts\\\"\"")
 
 # Find the libraries which will be needed
 find_package(HDF5 REQUIRED)
@@ -61,7 +61,7 @@ include_directories(${MORPH_INC_CORE} ${MORPH_INC_GL})
 
 # Assuming mathplot is installed in-tree.
 set(MORPH_INCLUDE_PATH "${PROJECT_SOURCE_DIR}/mathplot" CACHE PATH "The path to mathplot")
-include_directories(BEFORE ${MORPH_INCLUDE_PATH}/maths) #Allows sm/vec to be found.
+include_directories(BEFORE ${MORPH_INCLUDE_PATH}/maths) 
 include_directories(BEFORE ${MORPH_INCLUDE_PATH}/include) # Allows GL3/gl3.h to be found
 include_directories(BEFORE ${MORPH_INCLUDE_PATH})         # Allows morph/Header.h to be found
 

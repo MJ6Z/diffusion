@@ -2,28 +2,28 @@
 #include <array>
 #include <sstream>
 #include <iostream>
-#include <morph/RD_Base.h>
+#include "RD_Base.h"
 #include <sm/vvec>
 #include <functional>
 
 
 /*Inherit methods and attributes from the RD_base*/
 template <typename Flt>
-class D_calc : public morph::RD_Base<Flt>{
+class D_calc : public marcus::RD_Base<Flt>{
 public:
     alignas(alignof(std::vector<Flt>))
 
 
     //state variables.
-    morph::vvec<Flt> THflux;
-    morph::vvec<Flt> Fflux;
-    morph::vvec<Flt> T; //temperature
-    morph::vvec<Flt> show_celltype; //grid used to show rod types.
+    sm::vvec<Flt> THflux;
+    sm::vvec<Flt> Fflux;
+    sm::vvec<Flt> T; //temperature
+    sm::vvec<Flt> show_celltype; //grid used to show rod types.
 
-    morph::vvec<morph::vec<int,3>> coolant_positions; //RGB coordinates of coolant rods.
-    morph::vvec<morph::vec<int,3>> control_positions; //RGB coordinates of coolant rods.
-    morph::vvec<morph::vec<int,3>> fuel_positions; //RGB coordinates of coolant rods.
-    morph::vvec<morph::vec<int,3>> source_positions; //RGB coordinates of source neutron positions.
+    sm::vvec<sm::vec<int,3>> coolant_positions; //RGB coordinates of coolant rods.
+    sm::vvec<sm::vec<int,3>> control_positions; //RGB coordinates of coolant rods.
+    sm::vvec<sm::vec<int,3>> fuel_positions; //RGB coordinates of coolant rods.
+    sm::vvec<sm::vec<int,3>> source_positions; //RGB coordinates of source neutron positions.
 
 
     //coefficients & parameters.
@@ -57,10 +57,10 @@ public:
     alignas(Flt) Flt k4 = 1.0;
 
     //get data from class D_calc is inheritting from.
-    D_calc() : morph::RD_Base<Flt>() {}
+    D_calc() : marcus::RD_Base<Flt>() {}
 
         void allocate(){
-        morph::RD_Base<Flt>::allocate();
+        marcus::RD_Base<Flt>::allocate();
 
         //resize the state varaiables to
         this->resize_vector_variable (this->Fflux);
@@ -95,9 +95,9 @@ public:
 
     //HEX_USER_FLAG_0 IS A ***COOLANT*** channel.
     void init_coolant_rods(){
-        std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
-        for(auto coolant_pos: this->coolant_positions){//create a control_pos vector automatically to iterate through control_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findHexAt(coolant_pos);
+        std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto coolant_pos: this->coolant_positions){//create a control_pos vector automatically to iterate through control_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
+            pos = this->hg->findhexAt(coolant_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_0); //Assign the coolant channel flag to that point.
@@ -106,9 +106,9 @@ public:
     }
     //HEX_USER_FLAG_1 IS A ***CONTROL*** rod.
     void init_control_rods(){
-        std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
-        for(auto control_pos: this->control_positions){//create a control_pos vector automatically to iterate through control_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findHexAt(control_pos);
+        std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto control_pos: this->control_positions){//create a control_pos vector automatically to iterate through control_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
+            pos = this->hg->findhexAt(control_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_1); //Assign the coolant channel flag to that point.
@@ -117,9 +117,9 @@ public:
     }
     //HEX_USER_FLAG_2 IS A ***FUEL*** rod.
     void init_fuel_rods(){
-        std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
-        for(auto fuel_pos: this->fuel_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findHexAt(fuel_pos);
+        std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto fuel_pos: this->fuel_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
+            pos = this->hg->findhexAt(fuel_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_2); //Assign the coolant channel flag to that point.
@@ -128,9 +128,9 @@ public:
     }
     //HEX_USER_FLAG_3 IS A **SOURCE** position.
     void init_source_positions(){
-        std::list<morph::Hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
-        for(auto source_pos: this->source_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as morph::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findHexAt(source_pos);
+        std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto source_pos: this->source_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
+            pos = this->hg->findhexAt(source_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_3); //Assign the coolant channel flag to that point.
@@ -147,7 +147,7 @@ public:
         //compute laplacian & fill the vector.
         this->compute_laplace (Fflux_, lapFflux);
 
-        std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
+        std::list<sm::hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
         while(hi != this->hg->hexen.end()){ // until the end of hi, run:
             //calculating
             dFfluxdt[hi->vi] =this->D_Fflux*lapFflux[hi->vi] - this->absorbtion_strength*this->Fflux[hi->vi];
@@ -176,7 +176,7 @@ public:
         //compute laplacian & fill the vector.
         this->compute_laplace (THflux_, lapTHflux);
 
-        std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
+        std::list<sm::hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
         while(hi != this->hg->hexen.end()){ // until the end of hi, run:
             //calculating
             dTHfluxdt[hi->vi] = this->D_THflux*lapTHflux[hi->vi];
@@ -202,7 +202,7 @@ public:
         //create a vector (lapT) for & compute the scalar laplacian over the hexgrid for T_.
         std::vector<Flt> lapT(this->nhex, 0.0);
         this->compute_laplace (T_, lapT);
-        std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex, (hexen.begin)
+        std::list<sm::hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex, (hexen.begin)
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
             //calculating dT/dt
@@ -229,7 +229,7 @@ public:
         //Add an amount of neutron flux equal to  = intial flux value * e^(-lambda * t)
         //This uses the vector index vi of pos as the location of the hexagon as a list index
 
-        std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex, (hexen.begin)
+        std::list<sm::hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex, (hexen.begin)
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
             if(hi->getUserFlag(3)==true)
@@ -242,7 +242,7 @@ public:
     }
 
     void draw_celltype(){ //creates the grid of values associated with the rod types.
-        std::list<morph::Hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
+        std::list<sm::hex>::iterator hi = this->hg->hexen.begin(); //creates an iterator hi that starts on the first hex (hexen.begin)
         while(hi != this->hg->hexen.end()) // until the end of hi, run:
         {
             //coolant
