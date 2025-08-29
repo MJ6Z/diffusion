@@ -21,9 +21,9 @@ sudo apt install build-essential cmake git wget \
 ```
 
 ## Installation
-Installation guide for Debian/Ubuntu Linux. It has not been tested on any other linux distros. Morphalogica is supported on Linux, Mac and Windows - but this project is not.
+Installation guide for Debian/Ubuntu Linux. It has not been tested on any other linux distros. 
 
-(these insturctions include installation morphalogica in-tree)
+(these insturctions include installation of mathplot in-tree)
 ```bash
 #cloning my code
 git clone https://github.com/MJ6Z/diffusion
