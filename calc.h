@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <morph/RD_Base.h>
-#include <morph/vvec.h>
+#include <sm/vvec>
 #include <functional>
 
 

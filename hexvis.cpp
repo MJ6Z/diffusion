@@ -25,18 +25,18 @@
 /*
 * Morphologica includes here
 */
-# include <morph/Visual.h>
-# include <morph/HexGridVisual.h>
-# include <morph/HexGrid.h>
-# include <morph/ColourMap.h>
-# include <morph/VisualDataModel.h>
-# include <morph/Scale.h>
-# include <morph/vec.h>
+# include <mplot/Visual.h>
+# include <mplot/HexGridVisual.h>
+# include <mplot/HexGrid.h>
+# include <mplot/ColourMap.h>
+# include <mplot/VisualDataModel.h>
+# include <sm/scale>
+# include <sm/vec>
 /*
 * Other useful morph includes.
 */
-#include <morph/tools.h>
-#include <morph/Config.h> //json read-writer
+#include <mplot/tools.h>
+#include <sm/config> //json read-writer
 
 /*
 * main() is in control of the simulation. Parameters are controlled via JSON,
