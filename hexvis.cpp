@@ -23,7 +23,7 @@
 #include <limits>
 #include <chrono>
 /*
-* Morphologica includes here
+* seb's maths and mplot includes here. Note the conventions (mplot is a headeronly library with capitalization.)
 */
 # include <mplot/Visual.h>
 # include <mplot/HexGridVisual.h>
@@ -32,14 +32,11 @@
 # include <mplot/VisualDataModel.h>
 # include <sm/scale>
 # include <sm/vec>
-/*
-* Other useful morph includes.
-*/
 #include <mplot/tools.h>
 #include <sm/config> //json read-writer
 
 /*
-* main() is in control of the simulation. Parameters are controlled via JSON,
+* main() is in moderator of the simulation. Parameters are moderatorled via JSON,
 * argc and argv are used to pass in params.json at execution.*/
 
 
@@ -84,13 +81,13 @@ int main(int argc, char **argv){
         return 1;
     }
     //get coordinate r,g,b positions for contorl rods
-    sm::vvec<int> control_r = conf.getvvec<int>("control_r_locations");
-    sm::vvec<int> control_g = conf.getvvec<int>("control_g_locations");
-    sm::vvec<int> control_b = conf.getvvec<int>("control_b_locations");
+    sm::vvec<int> moderator_r = conf.getvvec<int>("moderator_r_locations");
+    sm::vvec<int> moderator_g = conf.getvvec<int>("moderator_g_locations");
+    sm::vvec<int> moderator_b = conf.getvvec<int>("moderator_b_locations");
 
     //check there are no incomplete coordinates.
-    if(control_r.size() != control_g.size() || control_g.size() != control_b.size()){
-        std::cerr<<"Ensure control positions are complete in paramsfile" <<std::endl;
+    if(moderator_r.size() != moderator_g.size() || moderator_g.size() != moderator_b.size()){
+        std::cerr<<"Ensure moderator positions are complete in paramsfile" <<std::endl;
         return 1;
     }
 
@@ -188,7 +185,7 @@ int main(int argc, char **argv){
     D.ellipse_b = conf.getDouble ("ellipse_b", 0.6);
 
 
-    // Control the size of the hexes, and therefore the number of hexes in the grid
+    // moderator the size of the hexes, and therefore the number of hexes in the grid
     D.hextohex_d = conf.getFloat ("hextohex_d", 0.01f);
     D.hexspan = conf.getFloat ("hexspan", 4.0f);
     //hexspan/hextohex = No of hexes.
@@ -220,7 +217,9 @@ int main(int argc, char **argv){
 
 
     D.sourceNeutrons = conf.getBool("sourceNeutrons",false);
-    D.source_strength = conf.getDouble ("source_strength", 1);
+    D.source_strength = conf.getDouble("source_strength", 1);
+
+    D.cooling_strength = conf.getDouble("cooling_strength", 0.5);
 
     //the temperature at which the reactor will undergo a metltdown.
     D.temperature_meltdown_value = conf.getFloat("temperature_meltdown_value",1);
@@ -256,9 +255,9 @@ int main(int argc, char **argv){
         }
 
 
-        D.control_positions.resize(control_b.size());    //can use control_b.size as r,g,b have been validated to eb equal in size.
-        for(unsigned int i=0; i<control_b.size(); i++){ //repacking data from individual control indexes into vec int, 3.
-            D.control_positions[i]={control_r[i],control_g[i],control_b[i]};
+        D.moderator_positions.resize(moderator_b.size());    //can use moderator_b.size as r,g,b have been validated to eb equal in size.
+        for(unsigned int i=0; i<moderator_b.size(); i++){ //repacking data from individual moderator indexes into vec int, 3.
+            D.moderator_positions[i]={moderator_r[i],moderator_g[i],moderator_b[i]};
         }
 
 
@@ -372,7 +371,7 @@ int main(int argc, char **argv){
     hgv5->zScale.setParams (ZScaleMin, ZScaleMax);
     hgv5->colourScale.do_autoscale = true;
     hgv5->cm.setType (cmt_celltype);
-    hgv5->addLabel ("CONTROL(light blue), COOLANT(dark blue), FUEL (red)", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+    hgv5->addLabel ("MODERATOR(light blue), COOLANT(dark blue), FUEL (red)", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
                     mplot::TextFeatures(0.1f, mplot::colour::white));
     hgv5->finalize();
     auto hgv5p = v1.addVisualModel(hgv5);

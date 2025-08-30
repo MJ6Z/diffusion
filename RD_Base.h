@@ -53,7 +53,7 @@
 namespace marcus {
 
     /*!
-     * Base class for RD systems
+     * Base class for Reaction-diffusion systems
      */
     template <typename Flt>
     class RD_Base

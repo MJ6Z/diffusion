@@ -1,13 +1,23 @@
+
+/*!
+* Include the reaction diffusion headerfile RD_base.h
+*/
+#include "RD_Base.h"
+
+/*!
+* standard library includes.
+*/
 #include <vector>
 #include <array>
 #include <sstream>
 #include <iostream>
-#include "RD_Base.h"
-#include <sm/vvec>
 #include <functional>
 
+//Seb's maths includes.
+#include <sm/vvec>
 
-/*Inherit methods and attributes from the RD_base*/
+
+/*Inherit methods and attributes from RD_base*/
 template <typename Flt>
 class D_calc : public marcus::RD_Base<Flt>{
 public:
@@ -21,7 +31,7 @@ public:
     sm::vvec<Flt> show_celltype; //grid used to show rod types.
 
     sm::vvec<sm::vec<int,3>> coolant_positions; //RGB coordinates of coolant rods.
-    sm::vvec<sm::vec<int,3>> control_positions; //RGB coordinates of coolant rods.
+    sm::vvec<sm::vec<int,3>> moderator_positions; //RGB coordinates of coolant rods.
     sm::vvec<sm::vec<int,3>> fuel_positions; //RGB coordinates of coolant rods.
     sm::vvec<sm::vec<int,3>> source_positions; //RGB coordinates of source neutron positions.
 
@@ -42,6 +52,8 @@ public:
     alignas(Flt) Flt source_strength = 0.1;
     alignas(Flt) Flt neutrons_per_fission = 3;
     alignas(Flt) Flt fuel_strength = 1;
+    alignas(Flt) Flt cooling_strength = 0.5;
+
 
     alignas(bool) bool doFluxNoise = false;
     alignas(bool) bool doTemperatureNoise = false;
@@ -87,7 +99,7 @@ public:
         //various init function calls, see there respective functions.
 
         init_coolant_rods();
-        init_control_rods();
+        init_moderator_rods();
         init_fuel_rods();
         init_source_positions();
         draw_celltype();
@@ -96,7 +108,7 @@ public:
     //HEX_USER_FLAG_0 IS A ***COOLANT*** channel.
     void init_coolant_rods(){
         std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
-        for(auto coolant_pos: this->coolant_positions){//create a control_pos vector automatically to iterate through control_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
+        for(auto coolant_pos: this->coolant_positions){//create a moderator_pos vector automatically to iterate through moderator_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
             pos = this->hg->findhexAt(coolant_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
@@ -104,11 +116,11 @@ public:
             }
         }
     }
-    //HEX_USER_FLAG_1 IS A ***CONTROL*** rod.
-    void init_control_rods(){
+    //HEX_USER_FLAG_1 IS A ***moderator*** rod.
+    void init_moderator_rods(){
         std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
-        for(auto control_pos: this->control_positions){//create a control_pos vector automatically to iterate through control_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findhexAt(control_pos);
+        for(auto moderator_pos: this->moderator_positions){//create a moderator_pos vector automatically to iterate through moderator_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
+            pos = this->hg->findhexAt(moderator_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_1); //Assign the coolant channel flag to that point.
@@ -152,7 +164,7 @@ public:
             //calculating
             dFfluxdt[hi->vi] =this->D_Fflux*lapFflux[hi->vi] - this->absorbtion_strength*this->Fflux[hi->vi];
 
-            //if the hex, hi, is a control cell.
+            //if the hex, hi, is a moderator cell.
             if(hi->getUserFlag(1)==true)
             {
                 dFfluxdt[hi->vi] += -this->moderation_strength*this->Fflux[hi->vi];
@@ -181,7 +193,7 @@ public:
             //calculating
             dTHfluxdt[hi->vi] = this->D_THflux*lapTHflux[hi->vi];
 
-            //moderate fast flux into thermal flux if the cell is a control rod.
+            //moderate fast flux into thermal flux if the cell is a moderator rod.
             if(hi->getUserFlag(1)==true)
             {
                 dTHfluxdt[hi->vi] += this->moderation_strength*this->Fflux[hi->vi];
@@ -215,7 +227,7 @@ public:
             //and T at hi is greater than the subtraction I'm going to make.
             if(hi->getUserFlag(0)==true)
             {
-                dTdt[hi->vi] -= 0.5*T[hi->vi];
+                dTdt[hi->vi] -= this->cooling_strength*T[hi->vi];
             }
             hi++; //iterate.
         }
@@ -250,7 +262,7 @@ public:
             {
                 show_celltype[hi->vi] = -1;
             }
-            //control
+            //moderator
             if(hi->getUserFlag(1)==true)
             {
                 show_celltype[hi->vi] = 1;
