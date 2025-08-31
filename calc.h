@@ -34,6 +34,8 @@ public:
     sm::vvec<sm::vec<int,3>> moderator_positions; //RGB coordinates of coolant rods.
     sm::vvec<sm::vec<int,3>> fuel_positions; //RGB coordinates of coolant rods.
     sm::vvec<sm::vec<int,3>> source_positions; //RGB coordinates of source neutron positions.
+    sm::vvec<sm::vec<int,3>> control_positions; //RGB coordinates of neutron-absorbing control rod positions.
+
 
 
     //coefficients & parameters.
@@ -53,6 +55,7 @@ public:
     alignas(Flt) Flt neutrons_per_fission = 3;
     alignas(Flt) Flt fuel_strength = 1;
     alignas(Flt) Flt cooling_strength = 0.5;
+    alignas(Flt) Flt control_strength = 0.3;
 
 
     alignas(bool) bool doFluxNoise = false;
@@ -102,6 +105,7 @@ public:
         init_moderator_rods();
         init_fuel_rods();
         init_source_positions();
+        init_control_positions();
         draw_celltype();
     }
 
@@ -109,7 +113,7 @@ public:
     void init_coolant_rods(){
         std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
         for(auto coolant_pos: this->coolant_positions){//create a moderator_pos vector automatically to iterate through moderator_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findhexAt(coolant_pos);
+            pos = this->hg->findhexat(coolant_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_0); //Assign the coolant channel flag to that point.
@@ -120,7 +124,7 @@ public:
     void init_moderator_rods(){
         std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
         for(auto moderator_pos: this->moderator_positions){//create a moderator_pos vector automatically to iterate through moderator_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findhexAt(moderator_pos);
+            pos = this->hg->findhexat(moderator_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_1); //Assign the coolant channel flag to that point.
@@ -131,7 +135,7 @@ public:
     void init_fuel_rods(){
         std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
         for(auto fuel_pos: this->fuel_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findhexAt(fuel_pos);
+            pos = this->hg->findhexat(fuel_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_2); //Assign the coolant channel flag to that point.
@@ -142,10 +146,22 @@ public:
     void init_source_positions(){
         std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
         for(auto source_pos: this->source_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
-            pos = this->hg->findhexAt(source_pos);
+            pos = this->hg->findhexat(source_pos);
             if(pos != this->hg->hexen.end())
             { //if pos is the end hex, then it is probably out of range.
                 pos->setUserFlags(HEX_USER_FLAG_3); //Assign the coolant channel flag to that point.
+            }
+        }
+    }
+
+    //HEX_USER_FLAG_4 IS A **CONTROL ROD**.
+    void init_control_positions(){
+        std::list<sm::hex>::iterator pos; //pos is a hex iterator used as a temporary variable to assign user flags to given hexes within the for loop.
+        for(auto control_pos: this->control_positions){ //create a fuel_pos vector automatically to iterate through fuel_postions, defined as sm::vec<int,3> above, and filled in hexvis.cpp.
+            pos = this->hg->findhexat(control_pos);
+            if(pos != this->hg->hexen.end())
+            { //if pos is the end hex, then it is probably out of range.
+                pos->setUserFlags(HEX_USER_FLAG_4); //Assign the coolant channel flag to that point.
             }
         }
     }
@@ -175,6 +191,11 @@ public:
             {
                 dFfluxdt[hi->vi] += this->fuel_strength*(THflux[hi->vi]*this->neutrons_per_fission);
             }
+            //if the hex at hi is a control rod:
+            if(hi->getUserFlag(4)==true)
+            {
+                dFfluxdt[hi->vi] -= 2*this->control_strength*Fflux[hi->vi];
+            }
 
             hi++; //iterate hi.
         }
@@ -198,13 +219,19 @@ public:
             {
                 dTHfluxdt[hi->vi] += this->moderation_strength*this->Fflux[hi->vi];
             }
-            hi++; //iterate hi.
 
             //if the hex at hi is a fuel rod.
             if(hi->getUserFlag(2)==true)
             {
                 dTHfluxdt[hi->vi] -= 0.1*THflux[hi->vi];
             }
+            //if the hex at hi is a control rod:
+            if(hi->getUserFlag(4)==true)
+            {
+                dTHfluxdt[hi->vi] -= this->control_strength*THflux[hi->vi];
+            }
+            hi++; //iterate hi.
+
 
         }
     }
@@ -260,19 +287,23 @@ public:
             //coolant
             if(hi->getUserFlag(0)==true)
             {
-                show_celltype[hi->vi] = -1;
+                show_celltype[hi->vi] = -10;
             }
             //moderator
             if(hi->getUserFlag(1)==true)
             {
-                show_celltype[hi->vi] = 1;
+                show_celltype[hi->vi] = 10;
             }
             //fuel
             if(hi->getUserFlag(2)==true)
             {
-                show_celltype[hi->vi] = 10;
+                show_celltype[hi->vi] = 100;
             }
-
+            //control
+            if(hi->getUserFlag(4)==true)
+            {
+                show_celltype[hi->vi] = 30;
+            }
 
             hi++; //iterate hi.
         }

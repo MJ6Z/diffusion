@@ -21,12 +21,12 @@ sudo apt install build-essential cmake git wget \
 ```
 
 ## Installation
-Installation guide for Debian/Ubuntu Linux. It has not been tested on any other linux distros. 
+Installation guide for Debian/Ubuntu Linux using ssh. It has not been tested on any other linux distros.
 
 (these insturctions include installation of mathplot in-tree)
 ```bash
 #cloning my code
-git clone https://github.com/MJ6Z/diffusion
+git clone git@github.com:MJ6Z/diffusion.git
 #cloning mathplot in tree.
 cd diffusion/
 git clone --recurse-submodules git@github.com:sebsjames/mathplot

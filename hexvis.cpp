@@ -112,6 +112,18 @@ int main(int argc, char **argv){
         return 1;
     }
 
+    //get coordinate r,g,b positions for controls.
+    sm::vvec<int> control_r = conf.getvvec<int>("control_r_locations");
+    sm::vvec<int> control_g = conf.getvvec<int>("control_g_locations");
+    sm::vvec<int> control_b = conf.getvvec<int>("control_b_locations");
+
+    //check there are no incomplete coordinates.
+    if(control_r.size() != control_g.size() || control_g.size() != control_b.size()){
+        std::cerr<<"Ensure control positions are complete in paramsfile" <<std::endl;
+        return 1;
+    }
+
+
 
     //getting simulation-wide parameters from JSON
 
@@ -218,7 +230,7 @@ int main(int argc, char **argv){
 
     D.sourceNeutrons = conf.getBool("sourceNeutrons",false);
     D.source_strength = conf.getDouble("source_strength", 1);
-
+    D.control_strength = conf.getDouble("control_strength", 0.3);
     D.cooling_strength = conf.getDouble("cooling_strength", 0.5);
 
     //the temperature at which the reactor will undergo a metltdown.
@@ -270,6 +282,14 @@ int main(int argc, char **argv){
         for(unsigned int i=0; i<source_b.size(); i++){ //repacking data from individual source indexes into vec int, 3.
             D.source_positions[i]={source_r[i],source_g[i],source_b[i]};
         }
+
+
+        D.control_positions.resize(control_b.size());    //can use control_b.size as r,g,b have been validated to eb equal in size.
+        for(unsigned int i=0; i<control_b.size(); i++){ //repacking data from individual control indexes into vec int, 3.
+            D.control_positions[i]={control_r[i],control_g[i],control_b[i]};
+        }
+
+
     }
 
 
@@ -371,7 +391,7 @@ int main(int argc, char **argv){
     hgv5->zScale.setParams (ZScaleMin, ZScaleMax);
     hgv5->colourScale.do_autoscale = true;
     hgv5->cm.setType (cmt_celltype);
-    hgv5->addLabel ("MODERATOR(light blue), COOLANT(dark blue), FUEL (red)", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
+    hgv5->addLabel ("FUEL-RED, MODERATOR-LBLUE, COOLANT-DBLUE, CONTROL-GREEN", { -0.2f, D.ellipse_b*-1.4f, 0.01f },
                     mplot::TextFeatures(0.1f, mplot::colour::white));
     hgv5->finalize();
     auto hgv5p = v1.addVisualModel(hgv5);

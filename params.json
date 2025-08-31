@@ -35,19 +35,20 @@
 
     "temperature_meltdown_value":2000,
 
-    "D_Fflux" : 0.007,
-    "D_THflux" : 0.003,
-    "D_T": 0.005,
-    "dt" : 0.0001,
+    "D_Fflux" : 0.01,
+    "D_THflux" : 0.006,
+    "D_T": 0.01,
+    "dt" : 0.0002,
 
-    "dTdt_THflux_coeff":0.5,
-    "dTdt_Fflux_coeff":0.3,
+    "dTdt_THflux_coeff":0.7,
+    "dTdt_Fflux_coeff":0.4,
 
     "moderation_strength": 0.6,
     "absorbtion_strength": 0.0,
     "fuel_strength":1.0,
     "neutrons_per_fission":3.0,
-    "cooling_strength":0.3,
+    "cooling_strength":0.8,
+    "control_strength":0.6,
 
     "sourceNeutrons": true,
     "source_strength": 0.1,
@@ -61,18 +62,21 @@
 
 
 "desc_channel_params":"Locations of coolant, moderator, and source channels in R G B (cubic) coordinates on the hexgrid.",
-    "coolant_r_locations":[0,0,0,0],
-    "coolant_g_locations":[-1,1,-2,2],
-    "coolant_b_locations":[1,-1,2,-2],
-    "moderator_r_locations":[1,-1,2,-2],
-    "moderator_g_locations":[-1,1,-2,2],
-    "moderator_b_locations":[0,0,0,0],
-    "fuel_r_locations":[-1,1,-2,2,0],
-    "fuel_g_locations":[0,0,0,0,0],
-    "fuel_b_locations":[1,-1,2,-2,0],
+    "coolant_r_locations":[0,0,0,0,2],
+    "coolant_g_locations":[-1,1,-2,2,-2],
+    "coolant_b_locations":[1,-1,2,-2,0],
+    "moderator_r_locations":[1,-1,-2],
+    "moderator_g_locations":[-1,1,2],
+    "moderator_b_locations":[0,0,0],
+    "fuel_r_locations":[-1,1,-2,2],
+    "fuel_g_locations":[0,0,0,0],
+    "fuel_b_locations":[1,-1,2,-2],
     "source_r_locations":[0],
     "source_g_locations":[0],
     "source_b_locations":[0],
+    "control_r_locations":[0,-2],
+    "control_g_locations":[0,2],
+    "control_b_locations":[0,0],
 
 
 
